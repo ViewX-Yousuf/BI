@@ -2223,15 +2223,22 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     setBusy(true, 'Loading sales from cloud…');
     try {
       const url = 'https://gwpzztcojzirwdqdwikq.supabase.co/storage/v1/object/public/sales-data/Sales%20till%2010%20th%20Nov.xlsx';
+      console.log('Fetching from:', url); // Check console for this
+      
       const response = await fetch(url);
+      console.log('Response status:', response.status); // Is it 200? 404? 403?
+      
       if (!response.ok) throw new Error('HTTP ' + response.status);
       const buffer = await response.arrayBuffer();
+      
+      console.log('File size:', buffer.byteLength); // Is it larger than 0?
+      
       processWorkbook(buffer, 'Sales till 10 th Nov.xlsx', { savedAt: Date.now() });
       $('salesUploadBtn').classList.add('loaded');
       $('salesUploadBtn').title = 'Loaded from Supabase';
     } catch (err) {
+      console.error('Supabase error:', err);
       showToast('Cloud load failed: ' + err.message, 'error');
-      console.error(err);
     } finally {
       setBusy(false);
     }
@@ -4685,14 +4692,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
       if (window.__filteredData) renderFormatAm(window.__filteredData);
     }
   });
-    // Disable manual uploads to force Supabase usage
-  const disableUploads = () => {
-    const f1 = $('fileInput'); if(f1) f1.disabled = true;
-    const f2 = $('wastageInput'); if(f2) f2.disabled = true;
-    const b1 = $('salesUploadBtn'); if(b1) b1.style.pointerEvents = 'none';
-    const b2 = $('wastageUploadBtn'); if(b2) b2.style.pointerEvents = 'none';
-  };
-  disableUploads();
+
 
   const FA_TABLES = [
     { id: 'faTableSegment', title: 'Segment Performance' },
