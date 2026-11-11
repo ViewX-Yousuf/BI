@@ -1796,9 +1796,7 @@ window.__activeTab = 'overview';
 function switchTab(tabName) {
   const meta = TAB_META[tabName];
   if (!meta) return;
-    if (tabName === 'wastage' && !(window.__wastageData && window.__wastageData.length)) {
-    loadWastageFromSupabase();
-  }
+
   window.__activeTab = tabName;
   document.querySelectorAll('.tab-btn').forEach(b => {
     const on = b.dataset.tab === tabName;
@@ -2627,12 +2625,16 @@ function getMaxDayForMonth(targetYear, targetMonth) {
       }
     }, 3000);
 
-    try {
-         // Force loading from Supabase on startup
+       try {
+      // Force loading from Supabase on startup
       loadingState.style.display = 'none';
       emptyState.style.display = 'none';
       clearTimeout(forceHideSpinner);
+      
+      // Load BOTH files at the same time
       loadSalesFromSupabase();
+      loadWastageFromSupabase(); 
+      
     } catch(e) {
       console.error('IDB Load Error:', e);
       loadingState.style.display = 'none';
