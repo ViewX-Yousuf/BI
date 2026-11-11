@@ -1796,6 +1796,9 @@ window.__activeTab = 'overview';
 function switchTab(tabName) {
   const meta = TAB_META[tabName];
   if (!meta) return;
+    if (tabName === 'wastage' && !(window.__wastageData && window.__wastageData.length)) {
+    loadWastageFromSupabase();
+  }
   window.__activeTab = tabName;
   document.querySelectorAll('.tab-btn').forEach(b => {
     const on = b.dataset.tab === tabName;
@@ -2215,6 +2218,45 @@ function getMaxDayForMonth(targetYear, targetMonth) {
   window.faAds = false;
 
   const fileInput = $('fileInput'), uploadLabel = $('uploadLabel');
+    // ===== SUPABASE CLOUD LOADERS =====
+  async function loadSalesFromSupabase() {
+    setBusy(true, 'Loading sales from cloud…');
+    try {
+      const url = 'https://gwpzztcojzirwdqdwikq.supabase.co/storage/v1/object/public/sales-data/Sales%20till%2010%20th%20Nov.xlsx';
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      const buffer = await response.arrayBuffer();
+      processWorkbook(buffer, 'Sales till 10 th Nov.xlsx', { savedAt: Date.now() });
+      $('salesUploadBtn').classList.add('loaded');
+      $('salesUploadBtn').title = 'Loaded from Supabase';
+    } catch (err) {
+      showToast('Cloud load failed: ' + err.message, 'error');
+      console.error(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function loadWastageFromSupabase() {
+    if (window.__wastageData && window.__wastageData.length) return; 
+    setBusy(true, 'Loading wastage from cloud…');
+    try {
+      const url = 'https://gwpzztcojzirwdqdwikq.supabase.co/storage/v1/object/public/sales-data/Wastage%20YTD.xlsx';
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      const buffer = await response.arrayBuffer();
+      processWastageWorkbook(buffer, 'Wastage YTD.xlsx', { savedAt: Date.now() }, true);
+      $('wastageUploadBtn').classList.add('loaded');
+      $('wastageUploadBtn').title = 'Loaded from Supabase';
+      showToast('Wastage data loaded from cloud', 'success');
+    } catch (err) {
+      showToast('Wastage load failed: ' + err.message, 'error');
+      console.error(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+  // ===================================
   const rowCountBadge = $('rowCountBadge');
   const filterBar = $('filterBar'), kpiPanel = $('kpiPanel'), chartsPanel = $('chartsPanel'), tablePanel = $('tablePanel');
   const emptyState = $('emptyState'), loadingState = $('loadingState'), errorBox = $('errorBox'), errorText = $('errorText');
@@ -2579,28 +2621,11 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     }, 3000);
 
     try {
-      const saved = await IDB.load();
-      if (!saved) {
-        emptyState.style.display = 'block';
-        loadingState.style.display = 'none';
-        clearTimeout(forceHideSpinner);
-      } else {
-        loadingState.style.display = 'flex';
-        emptyState.style.display = 'none';
-        setTimeout(() => {
-          try { processWorkbook(saved.buffer, saved.name, { savedAt: saved.savedAt }); }
-          catch(e) { console.error('ProcessWorkbook crashed:', e); }
-          finally { loadingState.style.display = 'none'; clearTimeout(forceHideSpinner); }
-        }, 50);
-      }
-
-      const savedWastage = await IDB.loadWastage();
-      if (savedWastage) {
-        setTimeout(() => {
-          try { processWastageWorkbook(savedWastage.buffer, savedWastage.name, { savedAt: savedWastage.savedAt }, true); }
-          catch(e) { console.error('ProcessWastage crashed:', e); }
-        }, 100);
-      }
+         // Force loading from Supabase on startup
+      loadingState.style.display = 'none';
+      emptyState.style.display = 'none';
+      clearTimeout(forceHideSpinner);
+      loadSalesFromSupabase();
     } catch(e) {
       console.error('IDB Load Error:', e);
       loadingState.style.display = 'none';
@@ -4660,6 +4685,14 @@ function getMaxDayForMonth(targetYear, targetMonth) {
       if (window.__filteredData) renderFormatAm(window.__filteredData);
     }
   });
+    // Disable manual uploads to force Supabase usage
+  const disableUploads = () => {
+    const f1 = $('fileInput'); if(f1) f1.disabled = true;
+    const f2 = $('wastageInput'); if(f2) f2.disabled = true;
+    const b1 = $('salesUploadBtn'); if(b1) b1.style.pointerEvents = 'none';
+    const b2 = $('wastageUploadBtn'); if(b2) b2.style.pointerEvents = 'none';
+  };
+  disableUploads();
 
   const FA_TABLES = [
     { id: 'faTableSegment', title: 'Segment Performance' },
