@@ -526,6 +526,16 @@
     #kpiPanel { position: static; border: none; padding: 0; margin-bottom: 16px; }
     #kpiPanel::before, #kpiPanel::after { content: none; }
     #kpiPanel > .kpi-card { background: color-mix(in srgb, var(--kpi-c, var(--primary)) 8%, var(--surface)); }
+    /* No ring on the Target Achievement card; all KPI cards share one height and aligned content */
+    #kpiPanel .kpi-ring { display: none !important; }
+    #kpiPanel > .kpi-card.kpi-hero { padding-inline-end: 14px; }
+    #kpiPanel { align-items: stretch; }
+    #kpiPanel > .kpi-card { height: 150px; min-height: 150px; justify-content: flex-start; gap: 6px; }
+    /* Change chip and its label on one line; the target line sits below the chip, like the other cards */
+    #kpiPanel .kpi-row { align-items: center; flex-wrap: wrap; row-gap: 6px; }
+    #kpiPanel #kpiTargetVs26Meta { flex-basis: 100%; }
+    /* Comparison lines stacked one below another, pinned to the bottom of each card */
+    #kpiPanel > .kpi-card .kpi-meta { white-space: pre-line; margin-top: auto; }
     /* Same short side lines for the row of three charts */
     #overviewExtras { position: relative; padding: 14px 0; }
     #overviewExtras::before, #overviewExtras::after { content: ''; position: absolute; top: 10px; bottom: 18px; width: 1px; background: #94a3b8; }
@@ -725,16 +735,32 @@
 </head>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
 <body>
-<div id="loginOverlay" style="display:none;position:fixed;inset:0;z-index:5000;background:var(--bg);align-items:center;justify-content:center;padding:20px;">
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:380px;box-shadow:var(--shadow-lg);">
-    <div style="font-size:18px;font-weight:700;margin-bottom:4px;">Sales Intelligence</div>
-    <div style="font-size:13px;color:var(--text-muted);margin-bottom:18px;">Sign in to view your stores</div>
-    <label style="font-size:12px;color:var(--text-muted);">Email</label>
-    <input id="loginEmail" type="email" autocomplete="username" style="width:100%;height:38px;margin:4px 0 12px;padding:0 12px;border:1px solid var(--border-strong);border-radius:8px;background:var(--bg);color:var(--text-main);">
-    <label style="font-size:12px;color:var(--text-muted);">Password</label>
-    <input id="loginPass" type="password" autocomplete="current-password" style="width:100%;height:38px;margin:4px 0 12px;padding:0 12px;border:1px solid var(--border-strong);border-radius:8px;background:var(--bg);color:var(--text-main);">
-    <div id="loginErr" style="color:var(--danger);font-size:12px;min-height:18px;margin:8px 0;"></div>
-    <button id="loginBtn" class="btn btn-primary" style="width:100%;">Sign in</button>
+<div id="loginOverlay" style="display:none;position:fixed;inset:0;z-index:5000;background:#fafaf9;align-items:center;justify-content:center;padding:24px;overflow:auto;">
+  <div style="width:100%;max-width:1040px;display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:stretch;min-height:520px;">
+    <div style="background:linear-gradient(160deg,#1e3a8a 0%,#2563eb 100%);border-radius:24px 0 0 24px;padding:44px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.16);display:inline-flex;align-items:center;justify-content:center;font-size:18px;">&#9673;</span>
+        <span style="font-size:17px;font-weight:600;">Sales Intelligence</span>
+      </div>
+      <div>
+        <div style="font-size:34px;font-weight:600;line-height:1.2;letter-spacing:-0.5px;">See every store,<br>every month, at a glance.</div>
+        <div style="font-size:15px;opacity:0.85;margin-top:14px;">Sales, targets and wastage in one place.</div>
+      </div>
+      <div style="font-size:15px;font-weight:500;opacity:0.9;">Numbers that tell the story</div>
+    </div>
+    <div style="background:#ffffff;border-radius:0 24px 24px 0;padding:44px 48px;display:flex;flex-direction:column;justify-content:center;">
+      <div style="font-size:28px;font-weight:600;color:#0a0a0a;letter-spacing:-0.4px;">Welcome back</div>
+      <div style="font-size:15px;color:#6b7280;margin:6px 0 26px;">Sign in to continue</div>
+      <label for="loginEmail" style="font-size:14px;color:#374151;margin-bottom:6px;">Email</label>
+      <input id="loginEmail" type="email" autocomplete="username" placeholder="name@drcafe.com" style="width:100%;height:46px;margin-bottom:16px;padding:0 16px;border:1px solid #d1d5db;border-radius:12px;background:#fff;color:#111827;font-size:15px;box-sizing:border-box;">
+      <label for="loginPass" style="font-size:14px;color:#374151;margin-bottom:6px;">Password</label>
+      <input id="loginPass" type="password" autocomplete="current-password" placeholder="Enter your password" style="width:100%;height:46px;margin-bottom:14px;padding:0 16px;border:1px solid #d1d5db;border-radius:12px;background:#fff;color:#111827;font-size:15px;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#374151;margin-bottom:18px;">
+        <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" checked style="width:16px;height:16px;accent-color:#2563eb;">Keep me signed in</label>
+      </div>
+      <div id="loginErr" style="color:#b91c1c;font-size:13px;min-height:18px;margin-bottom:8px;"></div>
+      <button id="loginBtn" type="button" style="width:100%;height:48px;border:none;border-radius:12px;background:#2563eb;color:#fff;font-size:16px;font-weight:600;cursor:pointer;">Sign in</button>
+    </div>
   </div>
 </div>
 <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
@@ -1971,11 +1997,84 @@ const TAB_META = {
 };
 window.__activeTab = 'overview';
 
+// ===== PER-PAGE FILTERS =====
+// Each page keeps its own filter settings. The first visit to a page sets its defaults:
+// all years, the latest month and category Food (YoY Compare: all years and all months).
+const tabFilterStore = {};
+let activeFilterTab = 'overview';
+const FILTER_SET_KEYS = ['year', 'month', 'store', 'area', 'dow', 'segment', 'format', 'category'];
+function captureTabFilters() {
+  const s = {};
+  FILTER_SET_KEYS.forEach(k => { if (FilterState[k]) s[k] = [...FilterState[k].selected]; });
+  s.dayFrom = document.getElementById('dayFrom').value;
+  s.dayTo = document.getElementById('dayTo').value;
+  return s;
+}
+function defaultTabFilters(tab) {
+  const rows = window.__rawData || [];
+  const allOf = k => (FilterState[k] ? FilterState[k].options.map(o => o.value) : []);
+  const s = { year: allOf('year'), month: allOf('month'), store: allOf('store'), area: allOf('area'), dow: allOf('dow'), segment: allOf('segment'), format: allOf('format'), category: allOf('category') };
+  if (tab !== 'yoy' && rows.length) {
+    const latestY = Math.max(...rows.map(r => r.year).filter(y => y != null));
+    const latestM = Math.max(...rows.filter(r => r.year === latestY).map(r => r.month).filter(m => m != null));
+    s.month = [String(latestM)];
+    const food = s.category.find(c => /food/i.test(c));
+    if (food) s.category = [food];
+  }
+  // Days run from 1 to the last day that has data (e.g. 1 to 11 when the file ends on the 11th)
+  s.dayFrom = '1';
+  // YoY Compare shows every day; the other pages stop at the last day that has data
+  s.dayTo = tab === 'yoy' ? '31' : String(latestDayOf(rows));
+  return s;
+}
+function latestDayOf(rows) {
+  if (!rows.length) return 31;
+  const lY = Math.max(...rows.map(r => r.year).filter(y => y != null));
+  const lM = Math.max(...rows.filter(r => r.year === lY).map(r => r.month).filter(m => m != null));
+  const d = Math.max(0, ...rows.filter(r => r.year === lY && r.month === lM).map(r => r.day).filter(x => x != null));
+  return d || 31;
+}
+function applyTabFilters(s) {
+  const pick = (k, fallback) => {
+    if (!FilterState[k]) return;
+    const valid = new Set(FilterState[k].options.map(o => o.value));
+    const keep = (s[k] || []).filter(v => valid.has(v));
+    FilterState[k].selected = new Set(keep.length ? keep : fallback);
+  };
+  const allVals = k => FilterState[k].options.map(o => o.value);
+  pick('year', allVals('year'));
+  pick('month', allVals('month'));
+  pick('area', allVals('area'));
+  pick('segment', allVals('segment'));
+  pick('format', allVals('format'));
+  pick('dow', allVals('dow'));
+  pick('category', allVals('category'));
+  rebuildStoreOptionsFromManagers();
+  pick('store', allVals('store'));
+  FILTER_SET_KEYS.forEach(k => { if (FilterState[k]) { renderOptions(k); updateChipLabel(k); } });
+  if (s.dayFrom) document.getElementById('dayFrom').value = s.dayFrom;
+  if (s.dayTo) document.getElementById('dayTo').value = s.dayTo;
+  if (window.applyFiltersAndRender) window.applyFiltersAndRender();
+}
+function applyTabState(tab) {
+  if (!(window.__rawData || []).length) return;
+  applyTabFilters(tabFilterStore[tab] || defaultTabFilters(tab));
+}
+// Called when the data has fully loaded (and when wastage arrives): sets defaults for the page being shown
+window.__applyTabDefaultsNow = function () {
+  if (!tabFilterStore[activeFilterTab]) applyTabState(activeFilterTab);
+};
+
 function switchTab(tabName) {
   const meta = TAB_META[tabName];
   if (!meta) return;
 
+  // Save this page's filters before leaving it, then set up the page being opened
+  if (activeFilterTab !== tabName && (window.__rawData || []).length) tabFilterStore[activeFilterTab] = captureTabFilters();
+  activeFilterTab = tabName;
+
   window.__activeTab = tabName;
+  if ((window.__rawData || []).length) applyTabState(tabName);
   document.querySelectorAll('.tab-btn').forEach(b => {
     const on = b.dataset.tab === tabName;
     b.classList.toggle('active', on);
@@ -2558,7 +2657,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     let curY = null, curM = null;
     if (selM.length === 1 && selM.length !== totalM) curM = selM[0];
     else if (selM.length > 1 && selM.length !== totalM) curM = Math.max(...selM);
-    else { const all = rawData.map(r => r.month).filter(m => m != null); curM = all.length ? all.reduce((a, b) => a > b ? a : b) : 12; }
+    else { const all = rawData.filter(r => r.year === rawMaxYear).map(r => r.month).filter(m => m != null); curM = all.length ? all.reduce((a, b) => a > b ? a : b) : 12; }
     // Current year = the latest selected year, or the latest year in the file when all are selected
     if (selY.length >= 1 && selY.length !== totalY) curY = Math.max(...selY);
     else curY = rawMaxYear;
@@ -2943,10 +3042,10 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     sRows.forEach(r => { if (r.year == null || r.month == null) return; const k = `${r.storeCode}||${r.area}||${r.month}`; if (tG.has(k)) return; const g = computeGroupTarget(tm, sRows, sData, r.storeCode, r.area, r.year, r.month, false); tG.set(k, g.target); });
     let fMT = 0; tG.forEach(v => fMT += v);
     const tFY = adsMode ? fMT / aDSalesY : fMT;
-    renderCompValue('kpiTargetVs26', tFY > 0 ? sYNet / tFY : NaN, 'kpiTargetVs26Meta', tFY > 0 ? `Target: ${fmtCur(tFY)}  •  ${sY}: ${fmtCur(sYNet)}` : 'No target data');
-    renderCompValue('kpiSalesLfl', n25 > 0 ? n26 / n25 : NaN, 'kpiSalesLflMeta', n25 > 0 ? `${LY}: ${fmtCur(n25)}  •  ${CY}: ${fmtCur(n26)}` : 'No data');
-    renderCompValue('kpiCcLfl', c25 > 0 ? c26 / c25 : NaN, 'kpiCcLflMeta', c25 > 0 ? `${LY}: ${fmtNum(c25)}  •  ${CY}: ${fmtNum(c26)}` : 'No data');
-    renderCompValue('kpiAtLfl', at25 > 0 ? at26 / at25 : NaN, 'kpiAtLflMeta', at25 > 0 ? `${LY}: ${fmtAT(at25)}  •  ${CY}: ${fmtAT(at26)}` : 'No data');
+    renderCompValue('kpiTargetVs26', tFY > 0 ? sYNet / tFY : NaN, 'kpiTargetVs26Meta', tFY > 0 ? `Target: ${fmtCur(tFY)}\n${sY}: ${fmtCur(sYNet)}` : 'No target data');
+    renderCompValue('kpiSalesLfl', n25 > 0 ? n26 / n25 : NaN, 'kpiSalesLflMeta', n25 > 0 ? `${LY}: ${fmtCur(n25)}\n${CY}: ${fmtCur(n26)}` : 'No data');
+    renderCompValue('kpiCcLfl', c25 > 0 ? c26 / c25 : NaN, 'kpiCcLflMeta', c25 > 0 ? `${LY}: ${fmtNum(c25)}\n${CY}: ${fmtNum(c26)}` : 'No data');
+    renderCompValue('kpiAtLfl', at25 > 0 ? at26 / at25 : NaN, 'kpiAtLflMeta', at25 > 0 ? `${LY}: ${fmtAT(at25)}\n${CY}: ${fmtAT(at26)}` : 'No data');
 
     // Headline values (the growth figures above become the small pills beside them)
     const tgtPct = tFY > 0 ? sYNet / tFY * 100 : null;
@@ -2969,7 +3068,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     const curL = `${MONTHS[ctx.curM-1]} ${ctx.curY}`, prevL = `${MONTHS[ctx.prevM-1]} ${ctx.prevY}`;
     $('kpiMomLabel').textContent = adsMode ? `${curL} Avg Daily Sales` : `${curL} Sales`;
     $('kpiMomLabel').title = `Month over month: ${curL} vs ${prevL}`;
-    renderCompValue('kpiMomSales', momR, 'kpiMomSalesMeta', pN > 0 ? `${prevL}: ${fmtCur(pN)}  •  ${curL}: ${fmtCur(cN)}` : 'No data');
+    renderCompValue('kpiMomSales', momR, 'kpiMomSalesMeta', pN > 0 ? `${prevL}: ${fmtCur(pN)}\n${curL}: ${fmtCur(cN)}` : 'No data');
     $('kpiMomMain').textContent = curR.length ? fmtCur(cN) : '—';
 
     // Period chip in the page header
@@ -6723,6 +6822,7 @@ createMonthCompare({
       var snap = snapshotFilters();
       applyRows(allSales, []);
       restoreFilters(snap);
+      window.__applyTabDefaultsNow();
       checkOverviewAgainstDatabase();
       checkTargetsAgainstDatabase();
       showToast('Full sales history loaded: ' + allSales.length + ' rows. Wastage loading in the background…', 'success');
@@ -6784,6 +6884,7 @@ createMonthCompare({
         setBusy(true, 'Loading wastage…');
         var w = await fetchKeyset('wastage_rows', WASTE_SEL);
         applyRows([], w);
+        window.__applyTabDefaultsNow();
         showToast('Wastage loaded: ' + w.length + ' rows', 'success');
       } catch (e) {
         console.error('Wastage load failed', e);
