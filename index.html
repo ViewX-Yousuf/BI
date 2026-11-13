@@ -6244,6 +6244,7 @@ function createMonthCompare({ hostId, toggleBtnId, groupings, stacked = false })
         <button type="button" class="toggle-btn" data-role="new" title="Only stores with no sales in the previous year"><i class="fas fa-star"></i> New Stores</button>
         <button type="button" class="toggle-btn" data-role="ads" title="Show average per store-day"><i class="fas fa-calculator"></i> ADS</button>
         <button type="button" class="export-btn excel" data-role="excel"><i class="fas fa-file-excel"></i> Excel</button>
+        <button type="button" class="export-btn pdf" data-role="pdf"><i class="fas fa-file-pdf"></i> PDF</button>
         <button type="button" class="cmp-close" data-role="close" aria-label="Close comparison"><i class="fas fa-xmark"></i></button>
       </div>
     </div>
@@ -6367,6 +6368,20 @@ function createMonthCompare({ hostId, toggleBtnId, groupings, stacked = false })
       XLSX.utils.book_append_sheet(wb, makeSheet(window.__tableToAoa(table, true)), '3-Month Comparison');
       await downloadWorkbook(wb, `Month_Comparison_${new Date().toISOString().slice(0, 10)}.xlsx`);
       showToast('Comparison exported', 'success');
+    });
+  });
+  panel.querySelector('[data-role="pdf"]').addEventListener('click', function () {
+    if (!tablePdfReady()) return;
+    guardBusy(this, 'Generating PDF...', () => {
+      const periods = picked.map(periodLabel).join(' / ');
+      const scope = cmpScope === 'lfl' ? 'LFL only' : cmpScope === 'new' ? 'New stores' : 'All stores';
+      downloadTablePdf({
+        tableEl: table,
+        title: '3-Month Comparison',
+        subtitle: `${periods} - ${scope}${cmpAds ? ' - ADS (per store-day)' : ''} - ${new Date().toLocaleString()}`,
+        filename: `Month_Comparison_${new Date().toISOString().slice(0, 10)}.pdf`
+      });
+      showToast('PDF downloaded', 'success');
     });
   });
   document.addEventListener('dashboard:filtered', render);
