@@ -193,9 +193,7 @@
     .filter-chip-wrap { position: relative; flex: 0 0 auto; }
     .filter-chip { display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border-strong); font-size: .82rem; font-weight: 500; color: var(--text-main); cursor: pointer; user-select: none; white-space: nowrap; height: 34px; transition: background .18s var(--ease), border-color .18s, color .18s, box-shadow .18s; }
     .filter-chip:hover { background: var(--surface-hover); border-color: var(--text-light); }
-    .filter-chip.open { border-color: var(--primary); box-shadow: 0 0 0 3px var(--ring); }
-    .filter-chip.locked { opacity: .55; cursor: not-allowed; pointer-events: none; }
-    .filter-chip.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+    .filter-chip.open { border-color: var(--primary); box-shadow: 0 0 0 3px var(--ring); }    .filter-chip.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
     .filter-chip i.lead { color: var(--text-light); font-size: .78rem; }
     .filter-chip .chip-value { color: var(--text-muted); font-weight: 500; font-size: .78rem; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .filter-chip.active .chip-value { color: var(--primary); font-weight: 600; }
@@ -364,6 +362,16 @@
     .leaderboard-pct { font-size: .72rem; font-weight: 600; text-align: end; }
     .anomaly-head { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
 
+    .heat-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 2px 0 14px; }
+    .heat-seg { display: inline-flex; gap: 6px; }
+    .ask-fab { position: fixed; right: 20px; bottom: 20px; z-index: 950; width: 48px; height: 48px; border-radius: 50%; border: none; background: var(--primary); color: #fff; font-size: 18px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-lg); }
+    .ask-fab:hover { filter: brightness(1.08); }
+    @media (max-width: 640px) { .ask-fab { right: 14px; bottom: 14px; } }
+    .cmp-overlay { position: fixed; inset: 0; z-index: 1400; background: rgba(15, 23, 42, .45); align-items: center; justify-content: center; padding: 20px; }
+    .cmp-overlay .cmp-panel { width: min(1180px, 100%); max-height: calc(100vh - 40px); display: flex; flex-direction: column; margin: 0; background: var(--surface); box-shadow: var(--shadow-lg); }
+    .cmp-overlay .table-scroll { max-height: none; flex: 1; overflow: auto; }
+    .cmp-close { border: none; background: transparent; color: var(--text-muted); cursor: pointer; padding: 6px 8px; font-size: 16px; }
+    .cmp-close:hover { color: var(--text-main); }
     .heatmap-row { display: grid; grid-template-columns: 110px 1fr; gap: 12px; align-items: center; margin-bottom: 8px; }
     .heatmap-label { font-size: .85rem; color: var(--text-muted); font-weight: 600; }
     .heatmap-bar-wrap { background: var(--bg); border-radius: 10px; overflow: hidden; height: 44px; }
@@ -394,6 +402,11 @@
     td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text-main); font-weight: 400; white-space: nowrap; text-align: end; font-variant-numeric: tabular-nums; transition: background .12s; }
     td:first-child, td.left-cell { text-align: start; }
     th.col-store, td.col-store { text-align: start; max-width: 230px; overflow: hidden; text-overflow: ellipsis; }
+    /* Store name stays fixed on the left while the table scrolls sideways */
+    #dataTable th.col-store, #dataTable td.col-store { position: sticky; left: 0; z-index: 3; background: var(--surface); box-shadow: 1px 0 0 var(--border); }
+    #dataTable th.col-store { background: var(--surface-hover); z-index: 12; }
+    /* Subtotal row stays on top of the scrolling store names */
+    #dataTable tr.subtotal-row td { background: var(--surface-hover); z-index: 6; }
     th.col-manager, td.col-manager { text-align: start; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
 
 
@@ -765,6 +778,7 @@
   </div>
 </div>
 <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
+<button type="button" class="ask-fab" id="askFab" aria-label="Ask your data" title="Ask your data"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i></button>
 <div class="busy-pill" id="busyPill"><i class="fas fa-circle-notch fa-spin"></i><span id="busyText">Processing…</span></div>
 
 <div class="app-layout">
@@ -838,7 +852,7 @@
           <button class="tool-item" id="pwBtn" role="menuitem"><i class="fas fa-key"></i><span>Change password</span></button>
           <button class="tool-item" id="syncBtn" role="menuitem" style="display:none"><i class="fas fa-database"></i><span>Sync to database</span></button>
           <div class="tool-sep"></div>
-          <button class="tool-item" id="langBtn" role="menuitem"><i class="fas fa-language"></i><span>Layout direction</span></button>
+          <button class="tool-item" id="langBtn" role="menuitem"><i class="fas fa-language"></i><span>Language</span></button>
           <button class="tool-item" id="helpBtn" role="menuitem"><i class="fas fa-question"></i><span>Help and shortcuts</span></button>
           <button class="tool-item" id="qualityBtn" role="menuitem"><i class="fas fa-clipboard-check"></i><span>Data quality</span></button>
           <button class="tool-item" id="themeToggle" role="menuitem"><i class="fas fa-moon"></i><span>Theme</span></button>
@@ -1179,7 +1193,15 @@
   <!-- HEATMAP TAB -->
   <div class="view-section" id="tabHeatmap">
     <div class="panel">
-      <div class="panel-title"><i class="fas fa-fire"></i> Day-of-Week Sales Distribution</div>
+      <div class="panel-title"><i class="fas fa-fire"></i> <span id="heatTitle">Sales by Day of Week</span></div>
+      <div class="heat-controls">
+        <div class="heat-seg">
+          <button type="button" class="toggle-btn active" data-hm="sales">Sales</button>
+          <button type="button" class="toggle-btn" data-hm="cc">CC</button>
+          <button type="button" class="toggle-btn" data-hm="at">AT</button>
+        </div>
+        <button type="button" class="toggle-btn" id="heatAdsBtn"><i class="fas fa-calculator"></i> ADS</button>
+      </div>
       <div id="heatmapContainer"></div>
     </div>
   </div>
@@ -1957,14 +1979,120 @@ function toggleTheme(withToast) {
 applyTheme();
 $('themeToggle').addEventListener('click', () => toggleTheme(true));
 
-// ===== LAYOUT DIRECTION (LTR / RTL) =====
-function applyDir(dir) { document.documentElement.setAttribute('dir', dir); safeSet('dir', dir); }
-if (safeGet('dir') === 'rtl') applyDir('rtl');
-$('langBtn').addEventListener('click', () => {
-  const next = document.documentElement.getAttribute('dir') === 'rtl' ? 'ltr' : 'rtl';
-  applyDir(next);
-  showToast(`Layout direction: ${next.toUpperCase()}`, 'info');
+// ===== LANGUAGE (English / Arabic) =====
+// Arabic switches the page to right-to-left and swaps the labels in the page's own text.
+// Numbers, store names and other data stay as they are.
+const AR_TEXT = {
+  'Sales Intelligence': 'ذكاء المبيعات', 'Performance Platform': 'منصة الأداء', 'Navigation': 'التنقل',
+  'Overview': 'نظرة عامة', 'Detailed': 'التفصيلي', 'Detailed Performance': 'الأداء التفصيلي', 'Format / AM': 'الصيغة / المدير',
+  'YoY Compare': 'مقارنة سنوية', 'Leaderboard': 'لوحة الترتيب', 'Heatmap': 'خريطة الحرارة', 'Insights': 'الرؤى', 'Wastage': 'الهدر',
+  'Filters': 'الفلاتر', 'Year': 'السنة', 'Month': 'الشهر', 'Manager': 'المدير', 'Store': 'الفرع', 'Segment': 'الشريحة',
+  'Format': 'الصيغة', 'Weekday': 'يوم الأسبوع', 'Category': 'الفئة', 'Days': 'الأيام', 'Reset': 'إعادة ضبط',
+  'Search records...': 'بحث في السجلات...', 'Search records…  ( / )': 'بحث في السجلات…  ( / )', 'Search...': 'بحث...',
+  'Select All': 'تحديد الكل', 'Clear': 'مسح', 'All': 'الكل', 'Sales': 'المبيعات', 'Customers': 'العملاء', 'Target': 'الهدف',
+  'Target Achievement': 'تحقيق الهدف', 'Avg Ticket (AT)': 'متوسط الفاتورة (AT)', 'YoY': 'سنوي', 'MoM': 'شهري',
+  'LFL Only': 'نفس المتاجر فقط', 'New Stores': 'المتاجر الجديدة', 'ADS': 'متوسط يومي', 'Pinned': 'المثبتة', '3-Month': '3 أشهر',
+  'Columns': 'الأعمدة', 'Export Excel': 'تصدير Excel', 'Export PDF': 'تصدير PDF', 'Expand table': 'توسيع الجدول',
+  'Copy table to clipboard': 'نسخ الجدول', 'Notifications': 'الإشعارات', 'Recent Activity': 'النشاط الأخير',
+  'Actions': 'الإجراءات', 'Ask your data': 'اسأل بياناتك', 'Quick find': 'بحث سريع', 'Saved views': 'العروض المحفوظة',
+  'Saved Views': 'العروض المحفوظة', '+ Save Current': '+ حفظ الحالي', 'Calculator': 'الآلة الحاسبة', 'Change password': 'تغيير كلمة المرور',
+  'Sync to database': 'مزامنة قاعدة البيانات', 'Language': 'اللغة', 'Help and shortcuts': 'المساعدة والاختصارات',
+  'Data quality': 'جودة البيانات', 'Theme': 'المظهر', 'Sign out': 'تسجيل الخروج', 'Toggle menu': 'تبديل القائمة',
+  'Wastage upload': 'رفع الهدر', 'Sales upload': 'رفع المبيعات', 'Store': 'الفرع', 'Manager': 'المدير',
+  'MO': 'الشهر', 'TARGET': 'الهدف', 'DAYS': 'الأيام', 'SALES': 'المبيعات', 'CC': 'العملاء', 'AT': 'متوسط الفاتورة', 'ADT': 'متوسط يومي',
+  'LFL': 'نفس المتاجر', 'TGT': 'الهدف', 'MOM': 'شهري', 'Ratios': 'النسب', 'Prev Month': 'الشهر السابق', 'Waste': 'الهدر',
+  'Waste %': 'نسبة الهدر %', 'Waste Qty': 'كمية الهدر', 'Subtotal': 'الإجمالي الفرعي', 'Total': 'الإجمالي',
+  'Sunday': 'الأحد', 'Monday': 'الاثنين', 'Tuesday': 'الثلاثاء', 'Wednesday': 'الأربعاء', 'Thursday': 'الخميس', 'Friday': 'الجمعة', 'Saturday': 'السبت',
+  'Sales by Day of Week': 'المبيعات حسب يوم الأسبوع', 'Customers by Day of Week': 'العملاء حسب يوم الأسبوع',
+  'Avg Ticket by Day of Week': 'متوسط الفاتورة حسب يوم الأسبوع',
+  'Welcome back': 'مرحبًا بعودتك', 'Sign in to continue': 'سجّل الدخول للمتابعة', 'Email': 'البريد الإلكتروني',
+  'Password': 'كلمة المرور', 'Keep me signed in': 'تذكّرني', 'Sign in': 'تسجيل الدخول',
+  'Numbers that tell the story': 'الأرقام تروي القصة', 'Processing…': 'جارٍ المعالجة…',
+  'Show only the stores you pinned': 'عرض المتاجر المثبتة فقط', 'Compare any three months side by side': 'قارن أي ثلاثة أشهر جنبًا إلى جنب',
+  'Show or hide columns, choose row density': 'إظهار الأعمدة أو إخفاؤها، واختيار كثافة الصفوف',
+  'Toggle menu ': 'تبديل القائمة ',
+};
+const AR_MONTHS = { Jan: 'يناير', Feb: 'فبراير', Mar: 'مارس', Apr: 'أبريل', May: 'مايو', Jun: 'يونيو', Jul: 'يوليو', Aug: 'أغسطس', Sep: 'سبتمبر', Oct: 'أكتوبر', Nov: 'نوفمبر', Dec: 'ديسمبر' };
+const AR_PREFIX = { 'Sales': 'المبيعات', 'Customers': 'العملاء', 'Avg Daily Sales': 'متوسط المبيعات اليومية', 'Avg Daily CC': 'متوسط العملاء اليومي', 'Avg Ticket': 'متوسط الفاتورة' };
+// Returns the Arabic text for a piece of English text, or null when there is no match
+function arFor(s) {
+  if (Object.prototype.hasOwnProperty.call(AR_TEXT, s)) return AR_TEXT[s];
+  let m;
+  if ((m = s.match(/^(Sales|Customers|Avg Daily Sales|Avg Daily CC|Avg Ticket) (\d{4})$/))) return AR_PREFIX[m[1]] + ' ' + m[2];
+  if ((m = s.match(/^([A-Z][a-z]{2}) (\d{4})$/)) && AR_MONTHS[m[1]]) return AR_MONTHS[m[1]] + ' ' + m[2];
+  if ((m = s.match(/^([A-Z][a-z]{2}) (\d{4}) Sales$/)) && AR_MONTHS[m[1]]) return 'مبيعات ' + AR_MONTHS[m[1]] + ' ' + m[2];
+  if ((m = s.match(/^Target: ([\s\S]+)$/))) return 'الهدف: ' + m[1];
+  if ((m = s.match(/^([+\-]?[\d.]+)% of total$/))) return m[1] + '% من الإجمالي';
+  if ((m = s.match(/^([+\-]?[\d.]+)% vs avg$/))) return m[1] + '% مقارنة بالمتوسط';
+  return null;
+}
+let uiLang = safeGet('lang') === 'ar' ? 'ar' : 'en';
+const arTextOriginals = new Map(), arAttrOriginals = new Map();
+const AR_ATTRS = ['placeholder', 'title', 'aria-label'];
+function translateTextNode(n) {
+  const raw = n.nodeValue;
+  if (!raw || !raw.trim()) return;
+  if (uiLang === 'ar') {
+    const key = raw.trim();
+    const ar = arFor(key);
+    if (ar == null || ar === key) return;
+    arTextOriginals.set(n, raw);
+    n.nodeValue = raw.replace(key, ar);
+  }
+}
+function translateAttrs(el) {
+  AR_ATTRS.forEach(a => {
+    if (!el.hasAttribute(a)) return;
+    if (uiLang === 'ar') {
+      const v = el.getAttribute(a), ar = arFor(v.trim());
+      if (ar == null) return;
+      if (!arAttrOriginals.has(el)) arAttrOriginals.set(el, {});
+      arAttrOriginals.get(el)[a] = v;
+      el.setAttribute(a, ar);
+    }
+  });
+}
+function translateTree(root) {
+  if (root.nodeType === 3) { translateTextNode(root); return; }
+  if (root.nodeType !== 1) return;
+  if (/^(SCRIPT|STYLE|TEXTAREA)$/.test(root.nodeName)) return;
+  translateAttrs(root);
+  root.querySelectorAll('[placeholder],[title],[aria-label]').forEach(translateAttrs);
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => (n.parentNode && /^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentNode.nodeName)) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+  const list = [];
+  while (w.nextNode()) list.push(w.currentNode);
+  list.forEach(translateTextNode);
+}
+function restoreEnglish() {
+  arTextOriginals.forEach((orig, n) => { n.nodeValue = orig; });
+  arTextOriginals.clear();
+  arAttrOriginals.forEach((attrs, el) => { Object.keys(attrs).forEach(a => el.setAttribute(a, attrs[a])); });
+  arAttrOriginals.clear();
+}
+const langObserver = new MutationObserver(muts => {
+  if (uiLang !== 'ar') return;
+  muts.forEach(m => {
+    if (m.type === 'childList') m.addedNodes.forEach(n => translateTree(n));
+    else if (m.type === 'characterData') translateTextNode(m.target);
+  });
 });
+function applyLanguage(lang) {
+  uiLang = lang === 'ar' ? 'ar' : 'en';
+  const html = document.documentElement;
+  html.setAttribute('dir', uiLang === 'ar' ? 'rtl' : 'ltr');
+  html.setAttribute('lang', uiLang);
+  safeSet('lang', uiLang);
+  if (uiLang === 'ar') translateTree(document.body); else restoreEnglish();
+  const lbl = $('langBtn') && $('langBtn').querySelector('span');
+  if (lbl) lbl.textContent = uiLang === 'ar' ? 'اللغة: English' : 'Language: العربية';
+}
+$('langBtn').addEventListener('click', () => {
+  const next = uiLang === 'ar' ? 'en' : 'ar';
+  applyLanguage(next);
+  showToast(next === 'ar' ? 'اللغة: العربية' : 'Language: English', 'info');
+});
+langObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+applyLanguage(uiLang);
 
 // ===== SIDEBAR =====
 const isMobileLayout = () => window.innerWidth <= 1024;
@@ -2059,24 +2187,7 @@ function applyTabFilters(s) {
 }
 function applyTabState(tab) {
   if (!(window.__rawData || []).length) return;
-  const s = { ...(tabFilterStore[tab] || defaultTabFilters(tab)) };
-  // Detailed page: the Manager filter is frozen on all managers
-  if (tab === 'table' && FilterState.area) s.area = FilterState.area.options.map(o => o.value);
-  applyTabFilters(s);
-}
-// Freezes or unfreezes the Manager chip (used on the Detailed page)
-function setManagerLock(on) {
-  const chip = document.querySelector('[data-chip="area"]');
-  if (!chip) return;
-  chip.classList.toggle('locked', !!on);
-  chip.setAttribute('aria-disabled', on ? 'true' : 'false');
-  chip.tabIndex = on ? -1 : 0;
-  chip.title = on ? 'Manager is fixed on the Detailed page' : '';
-  if (on) {
-    chip.classList.remove('open');
-    const dd = document.querySelector('[data-dropdown="area"]');
-    if (dd) dd.classList.remove('open');
-  }
+  applyTabFilters(tabFilterStore[tab] || defaultTabFilters(tab));
 }
 // Called when the data has fully loaded (and when wastage arrives): sets defaults for the page being shown
 window.__applyTabDefaultsNow = function () {
@@ -2090,7 +2201,6 @@ function switchTab(tabName) {
   // Save this page's filters before leaving it, then set up the page being opened
   if (activeFilterTab !== tabName && (window.__rawData || []).length) tabFilterStore[activeFilterTab] = captureTabFilters();
   activeFilterTab = tabName;
-  setManagerLock(tabName === 'table');
 
   window.__activeTab = tabName;
   if ((window.__rawData || []).length) applyTabState(tabName);
@@ -2480,7 +2590,6 @@ function closeFilterDropdowns() {
 document.querySelectorAll('.filter-chip').forEach(chip => {
   chip.addEventListener('click', e => {
     e.stopPropagation();
-    if (chip.classList.contains('locked')) return;
     const key = chip.dataset.chip;
     const dd = document.querySelector(`[data-dropdown="${key}"]`);
     const isOpen = dd.classList.contains('open');
@@ -3248,7 +3357,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     showToast('Filters reset', 'info');
   });
 
-  $('adsToggle').addEventListener('click', () => { adsMode = !adsMode; $('adsToggle').classList.toggle('active', adsMode); applyFiltersAndRender(); });
+  $('adsToggle').addEventListener('click', () => { adsMode = !adsMode; $('adsToggle').classList.toggle('active', adsMode); if ($('heatAdsBtn')) $('heatAdsBtn').classList.toggle('active', adsMode); applyFiltersAndRender(); });
   $('lflToggle').addEventListener('click', () => {
     lflOnly = !lflOnly;
     $('lflToggle').classList.toggle('active', lflOnly);
@@ -4647,43 +4756,75 @@ function getMaxDayForMonth(targetYear, targetMonth) {
   }
 
   // ===== HEATMAP =====
+  // Sales, customers (CC) and average ticket (AT) by day of the week.
+  // The % is each day's share of the total; with ADS on, values are per store-day.
+  let heatMetric = 'sales';
+  let lastHeatData = null;
+  const HEAT_TITLES = { sales: 'Sales by Day of Week', cc: 'Customers by Day of Week', at: 'Avg Ticket by Day of Week' };
   function renderHeatmap(data) {
-    if (!data || !data.length) { $('heatmapContainer').innerHTML = '<p style="text-align:center; color:var(--text-light); padding:20px;">No data</p>'; return; }
-    const dayMap = new Map();
-    let maxVal = 0;
+    if (data) lastHeatData = data; else data = lastHeatData;
+    const box = $('heatmapContainer');
+    if ($('heatTitle')) $('heatTitle').textContent = HEAT_TITLES[heatMetric] + (adsMode && heatMetric !== 'at' ? ' (ADS)' : '');
+    if (!data || !data.length) { box.innerHTML = '<p style="text-align:center; color:var(--text-light); padding:20px;">No data</p>'; return; }
+    const agg = Array.from({ length: 7 }, () => ({ net: 0, cc: 0, days: new Set() }));
+    let any = false;
     data.forEach(r => {
       if (!r.dob) return;
-      const dow = r.dob.getDay();
-      if (!dayMap.has(dow)) dayMap.set(dow, 0);
-      dayMap.set(dow, dayMap.get(dow) + r.net);
-      if (dayMap.get(dow) > maxVal) maxVal = dayMap.get(dow);
+      const a = agg[r.dob.getDay()];
+      a.net += r.net || 0;
+      a.cc += r.orders || 0;
+      if (r.net > 0) a.days.add(`${r.storeCode}|${r.year}-${r.month}-${r.day}`);
+      any = true;
     });
+    if (!any) { box.innerHTML = '<p style="text-align:center; color:var(--text-light); padding:20px;">No date data available.</p>'; return; }
 
-    if (!dayMap.size) { $('heatmapContainer').innerHTML = '<p style="text-align:center; color:var(--text-light); padding:20px;">No date data available.</p>'; return; }
+    const perDay = a => (adsMode ? Math.max(1, a.days.size) : 1);
+    const vals = agg.map(a => heatMetric === 'sales' ? a.net / perDay(a)
+                            : heatMetric === 'cc' ? a.cc / perDay(a)
+                            : (a.cc > 0 ? a.net / a.cc : 0));
+    const sumNet = agg.reduce((s, a) => s + a.net, 0), sumCc = agg.reduce((s, a) => s + a.cc, 0);
+    const sumVals = vals.reduce((s, v) => s + v, 0);
+    const overallAt = sumCc > 0 ? sumNet / sumCc : 0;
+    const maxVal = Math.max(0, ...vals);
 
     let html = '';
     for (let d = 0; d < 7; d++) {
-      const val = dayMap.get(d) || 0;
-      const pct = maxVal > 0 ? (val / maxVal) * 100 : 0;
-      const barColor = pct > 75 ? 'linear-gradient(90deg, #3b82f6, #1d4ed8)'
-                    : pct > 50 ? 'linear-gradient(90deg, #60a5fa, #3b82f6)'
-                    : pct > 25 ? 'linear-gradient(90deg, #93c5fd, #60a5fa)'
+      const val = vals[d];
+      const width = maxVal > 0 ? (val / maxVal) * 100 : 0;
+      const barColor = width > 75 ? 'linear-gradient(90deg, #3b82f6, #1d4ed8)'
+                    : width > 50 ? 'linear-gradient(90deg, #60a5fa, #3b82f6)'
+                    : width > 25 ? 'linear-gradient(90deg, #93c5fd, #60a5fa)'
                     : 'linear-gradient(90deg, #dbeafe, #93c5fd)';
-      const textColor = pct > 50 ? '#fff' : '#0f172a';
+      const textColor = width > 50 ? '#fff' : '#0f172a';
+      let lead, tail;
+      if (heatMetric === 'at') {
+        const diff = overallAt > 0 ? (val / overallAt - 1) * 100 : 0;
+        lead = `${diff >= 0 ? '+' : ''}${diff.toFixed(1)}% vs avg`;
+        tail = val > 0 ? fmtAT(val) : '—';
+      } else {
+        lead = `${sumVals > 0 ? (val / sumVals * 100).toFixed(1) : '0.0'}% of total`;
+        tail = heatMetric === 'sales' ? fmtCur(val) : fmtNum(val);
+      }
       html += `
         <div class="heatmap-row">
           <div class="heatmap-label">${DAYS[d]}</div>
           <div class="heatmap-bar-wrap">
-            <div class="heatmap-bar" style="width:${Math.max(pct, 15)}%; background:${barColor}; color:${textColor};">
-              <span>${pct.toFixed(0)}%</span>
-              <span>${fmtCur(val)}</span>
+            <div class="heatmap-bar" style="width:${Math.max(width, 15)}%; background:${barColor}; color:${textColor};">
+              <span>${lead}</span>
+              <span>${tail}</span>
             </div>
           </div>
         </div>
       `;
     }
-    $('heatmapContainer').innerHTML = html;
+    box.innerHTML = html;
   }
+  document.querySelectorAll('[data-hm]').forEach(b => b.addEventListener('click', () => {
+    heatMetric = b.dataset.hm;
+    document.querySelectorAll('[data-hm]').forEach(x => x.classList.toggle('active', x === b));
+    renderHeatmap();
+  }));
+  $('heatAdsBtn').addEventListener('click', () => $('adsToggle').click());
 
   // ===== DETAILED TABLE =====
   // Small localStorage helpers: storage can be blocked, so reads fall back and writes fail quietly
@@ -4916,7 +5057,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
       if (sDN25 > 0 || sDN26 > 0) stCls = sDN26 >= sDN25 ? 'cell-positive' : 'cell-negative';
       const stPct = st.net2026 > 0 ? (st.wasteCost / st.net2026) : 0;
       parts.push(`<tr class="subtotal-row">
-      <td colspan="${leftColSpan()}" class="left-cell">Subtotal (${rows.length} rows)</td>
+      <td class="left-cell col-store"><strong>Total</strong> (${rows.length} rows)</td>${leftColSpan() > 1 ? `<td colspan="${leftColSpan() - 1}" class="left-cell"></td>` : ''}
       <td class="cell-2025">${Math.round(avg25)}</td>
       <td class="cell-2025">${fmtCur(sDN25)}</td>
       <td class="cell-2025">${fmtNum(sDO25)}</td>
@@ -6081,25 +6222,30 @@ document.addEventListener('DOMContentLoaded', () => {
 // ===== 3-MONTH COMPARISON (Detailed and Format / AM pages) =====
 // Pick any three months; sales, customers and average ticket are shown side by side with the change between them.
 // All filters except Year and Month apply, exactly as they do for the previous-month columns.
-function createMonthCompare({ hostId, toggleBtnId, groupings }) {
+function createMonthCompare({ hostId, toggleBtnId, groupings, stacked = false }) {
   const host = document.getElementById(hostId), toggleBtn = document.getElementById(toggleBtnId);
   if (!host || !toggleBtn) return;
   const panel = document.createElement('div');
   panel.className = 'table-container cmp-panel';
-  panel.style.display = 'none';
+  const overlay = document.createElement('div');
+  overlay.className = 'cmp-overlay';
+  overlay.style.display = 'none';
+  overlay.appendChild(panel);
+  document.body.appendChild(overlay);
   panel.innerHTML = `
     <div class="table-header-bar">
       <h3><i class="fas fa-code-compare"></i> 3-Month Comparison</h3>
       <div class="table-controls">
-        ${groupings.length > 1 ? `<div class="segmented" data-role="group">${groupings.map((g, i) => `<button type="button" class="seg-btn ${i === 0 ? 'active' : ''}" data-group="${i}">${g.label}</button>`).join('')}</div>` : ''}
+        ${groupings.length > 1 && !stacked ? `<div class="segmented" data-role="group">${groupings.map((g, i) => `<button type="button" class="seg-btn ${i === 0 ? 'active' : ''}" data-group="${i}">${g.label}</button>`).join('')}</div>` : ''}
         <select class="cmp-select" data-i="0" aria-label="First month"></select>
         <select class="cmp-select" data-i="1" aria-label="Second month"></select>
         <select class="cmp-select" data-i="2" aria-label="Third month"></select>
+        <button type="button" class="toggle-btn" data-role="ads" title="Show average per store-day"><i class="fas fa-calculator"></i> ADS</button>
         <button type="button" class="export-btn excel" data-role="excel"><i class="fas fa-file-excel"></i> Excel</button>
+        <button type="button" class="cmp-close" data-role="close" aria-label="Close comparison"><i class="fas fa-xmark"></i></button>
       </div>
     </div>
     <div class="table-scroll"><table><thead></thead><tbody></tbody></table></div>`;
-  host.insertBefore(panel, host.firstChild);
 
   const selects = [...panel.querySelectorAll('.cmp-select')];
   const table = panel.querySelector('table');
@@ -6127,45 +6273,71 @@ function createMonthCompare({ hostId, toggleBtnId, groupings }) {
   function render() {
     if (panel.style.display === 'none') return;
     if (!refreshPeriods()) { table.tBodies[0].innerHTML = '<tr><td class="modal-empty" colspan="20">Upload a sales file first.</td></tr>'; return; }
-    const grouping = groupings[groupIdx], pass = window.__passNonPeriod || (() => true);
-    const groups = new Map();
-    (window.__rawData || []).forEach(r => {
-      if (!r.year || !r.month) return;
-      const key = periodKey(r);
-      if (!picked.includes(key) || !pass(r)) return;
-      const id = grouping.idOf(r);
-      if (!groups.has(id)) groups.set(id, { name: grouping.nameOf(r), extra: grouping.extraOf ? grouping.extraOf(r) : null, net: [0, 0, 0], cc: [0, 0, 0] });
-      const g = groups.get(id);
-      picked.forEach((p, i) => { if (p === key) { g.net[i] += r.net; g.cc[i] += r.orders; } });
-    });
-    const rows = [...groups.values()].filter(g => g.net.some(v => v > 0)).sort((a, b) => b.net[2] - a.net[2]);
+    // Stacked mode (Format / AM): Segment, Format and Manager tables one below another in the same popup
+    const shownGroupings = stacked ? groupings : [groupings[groupIdx]];
+    const pass = window.__passNonPeriod || (() => true);
     const cls = ['2025', 'prev', '2026'];
-    const hasExtra = !!grouping.extraLabel;
+    const hasExtra = !stacked && !!groupings[groupIdx].extraLabel;
+    const headLabel = stacked ? 'Group' : groupings[groupIdx].label;
+    const COLS = (hasExtra ? 2 : 1) + 9 + 3;
+    const groupRows = grouping => {
+      const groups = new Map();
+      (window.__rawData || []).forEach(r => {
+        if (!r.year || !r.month) return;
+        const key = periodKey(r);
+        if (!picked.includes(key) || !pass(r)) return;
+        const id = grouping.idOf(r);
+        if (!groups.has(id)) groups.set(id, { name: grouping.nameOf(r), extra: grouping.extraOf ? grouping.extraOf(r) : null, net: [0, 0, 0], cc: [0, 0, 0], days: [new Set(), new Set(), new Set()] });
+        const g = groups.get(id);
+        picked.forEach((p, i) => { if (p === key) { g.net[i] += r.net; g.cc[i] += r.orders; if (r.net > 0) g.days[i].add(`${r.storeCode}|${r.year}-${r.month}-${r.day}`); } });
+      });
+      return [...groups.values()].filter(g => g.net.some(v => v > 0)).sort((a, b) => b.net[2] - a.net[2]);
+    };
     table.tHead.innerHTML = `
       <tr><th colspan="${hasExtra ? 2 : 1}" class="left-cell">&nbsp;</th>
         ${picked.map((p, i) => `<th colspan="3" class="group-${cls[i]}">${periodLabel(p)}</th>`).join('')}
         <th colspan="3" class="group-ratios">Sales change</th></tr>
-      <tr><th class="left-cell">${grouping.label}</th>${hasExtra ? `<th class="left-cell">${grouping.extraLabel}</th>` : ''}
+      <tr><th class="left-cell">${headLabel}</th>${hasExtra ? `<th class="left-cell">${groupings[groupIdx].extraLabel}</th>` : ''}
         ${picked.map((p, i) => `<th class="group-${cls[i]}">Sales</th><th class="group-${cls[i]}">CC</th><th class="group-${cls[i]}">AT</th>`).join('')}
         <th class="group-ratios">2nd vs 1st</th><th class="group-ratios">3rd vs 2nd</th><th class="group-ratios">3rd vs 1st</th></tr>`;
-    const monthCells = g => g.net.map((n, i) => `<td class="cell-${cls[i]}">${fmtCur(n)}</td><td class="cell-${cls[i]}">${fmtNum(g.cc[i])}</td><td class="cell-${cls[i]}">${fmtAT(g.cc[i] > 0 ? n / g.cc[i] : 0)}</td>`).join('');
-    const changeCells = g => pct(g.net[1], g.net[0]) + pct(g.net[2], g.net[1]) + pct(g.net[2], g.net[0]);
-    const total = { net: [0, 0, 0], cc: [0, 0, 0] };
-    const body = rows.map(g => {
-      g.net.forEach((n, i) => { total.net[i] += n; total.cc[i] += g.cc[i]; });
-      return `<tr><td class="left-cell"><strong>${escapeHtml(g.name)}</strong></td>${hasExtra ? `<td class="left-cell">${escapeHtml(g.extra || '—')}</td>` : ''}${monthCells(g)}${changeCells(g)}</tr>`;
+    // With ADS on, each month is shown per store-day (sales and customers divided by the store-days with sales)
+    const per = g => ({
+      net: g.net.map((n, i) => cmpAds ? n / Math.max(1, g.days[i].size) : n),
+      cc: g.cc.map((c, i) => cmpAds ? c / Math.max(1, g.days[i].size) : c)
     });
-    if (rows.length) body.push(`<tr class="subtotal-row"><td class="left-cell" colspan="${hasExtra ? 2 : 1}">Total (${rows.length} rows)</td>${monthCells(total)}${changeCells(total)}</tr>`);
-    else body.push('<tr><td class="modal-empty" colspan="20">No sales in the selected months for the current filters.</td></tr>');
+    const monthCells = g => { const v = per(g); return v.net.map((n, i) => `<td class="cell-${cls[i]}">${fmtCur(n)}</td><td class="cell-${cls[i]}">${fmtNum(v.cc[i])}</td><td class="cell-${cls[i]}">${fmtAT(v.cc[i] > 0 ? n / v.cc[i] : 0)}</td>`).join(''); };
+    const changeCells = g => { const v = per(g); return pct(v.net[1], v.net[0]) + pct(v.net[2], v.net[1]) + pct(v.net[2], v.net[0]); };
+    const body = [];
+    shownGroupings.forEach(grouping => {
+      const rows = groupRows(grouping);
+      if (stacked) body.push(`<tr class="cmp-section"><td colspan="${COLS}" class="left-cell"><strong>${grouping.label}</strong></td></tr>`);
+      const total = { net: [0, 0, 0], cc: [0, 0, 0], days: [new Set(), new Set(), new Set()] };
+      rows.forEach(g => {
+        g.net.forEach((n, i) => { total.net[i] += n; total.cc[i] += g.cc[i]; g.days[i].forEach(k => total.days[i].add(k)); });
+        body.push(`<tr><td class="left-cell"><strong>${escapeHtml(g.name)}</strong></td>${hasExtra ? `<td class="left-cell">${escapeHtml(g.extra || '—')}</td>` : ''}${monthCells(g)}${changeCells(g)}</tr>`);
+      });
+      if (rows.length) body.push(`<tr class="subtotal-row"><td class="left-cell" colspan="${hasExtra ? 2 : 1}">Total (${rows.length} rows)</td>${monthCells(total)}${changeCells(total)}</tr>`);
+      else body.push('<tr><td class="modal-empty" colspan="20">No sales in the selected months for the current filters.</td></tr>');
+    });
     table.tBodies[0].innerHTML = body.join('');
   }
 
-  toggleBtn.addEventListener('click', () => {
-    const show = panel.style.display === 'none';
-    panel.style.display = show ? '' : 'none';
-    toggleBtn.classList.toggle('active', show);
-    if (show) { render(); panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+  let cmpAds = false;
+  panel.querySelector('[data-role="ads"]').addEventListener('click', function () {
+    cmpAds = !cmpAds;
+    this.classList.toggle('active', cmpAds);
+    render();
   });
+  // Opens in its own popup window over the page
+  function setCmpOpen(open) {
+    overlay.style.display = open ? 'flex' : 'none';
+    toggleBtn.classList.toggle('active', open);
+    if (open) render();
+  }
+  toggleBtn.addEventListener('click', () => setCmpOpen(overlay.style.display === 'none'));
+  panel.querySelector('[data-role="close"]').addEventListener('click', () => setCmpOpen(false));
+  overlay.addEventListener('click', e => { if (e.target === overlay) setCmpOpen(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.style.display !== 'none') setCmpOpen(false); });
   selects.forEach((sel, i) => sel.addEventListener('change', () => { picked[i] = sel.value; render(); }));
   panel.querySelectorAll('[data-group]').forEach(btn => btn.addEventListener('click', () => {
     groupIdx = Number(btn.dataset.group);
@@ -6189,7 +6361,7 @@ createMonthCompare({
   groupings: [{ label: 'Store', idOf: r => `${r.storeCode}||${r.area}`, nameOf: storeDisplayName, extraLabel: 'Manager', extraOf: r => r.area }]
 });
 createMonthCompare({
-  hostId: 'tabFormatAm', toggleBtnId: 'faCompareBtn',
+  hostId: 'tabFormatAm', toggleBtnId: 'faCompareBtn', stacked: true,
   groupings: [
     { label: 'Segment', idOf: r => r.segment || 'UNMAPPED', nameOf: r => r.segment || 'UNMAPPED' },
     { label: 'Format', idOf: r => r.format || 'UNMAPPED', nameOf: r => r.format || 'UNMAPPED' },
@@ -6348,6 +6520,7 @@ createMonthCompare({
   $('askForm').addEventListener('submit', e => { e.preventDefault(); ask(input.value); input.value = ''; });
   input.addEventListener('keydown', e => { if (e.key === 'Escape') drawer.classList.remove('open'); });
   $('askBtn').addEventListener('click', () => { if (drawer.classList.toggle('open')) setTimeout(() => input.focus(), 60); });
+  $('askFab').addEventListener('click', () => { if (drawer.classList.toggle('open')) setTimeout(() => input.focus(), 60); });
   $('askClose').addEventListener('click', () => drawer.classList.remove('open'));
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && e.target !== input) drawer.classList.remove('open'); });
 })();
