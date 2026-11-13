@@ -133,6 +133,18 @@
 
     /* ============ PAGE HEAD ============ */
     .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 6px 0 16px; }
+    /* Subtitle and period box share one line under the page title */
+    .page-sub-line { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; }
+    .page-sub-line p { margin: 0; }
+    /* Page title and period box sit on the top bar, beside the app name; the separate header row is no longer needed */
+    .page-head { display: none; }
+    .topbar-left #pageTitle { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.3px; white-space: nowrap; margin: 0; }
+    .topbar-left #periodChip { white-space: nowrap; background: none; border: none; padding: 0; font-size: .9rem; }
+    .topbar-left #periodChip i { display: none; }
+    #notifPanel #rowCountBadge { display: inline-flex; margin: 10px 16px; font-size: .78rem; }
+    /* Title and period box on one line; the subtitle sentence is hidden */
+    .page-head > div:first-child { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+    #pageSub { display: none; }
     .page-head h2 { font-size: 1.3rem; font-weight: 700; letter-spacing: -.4px; }
     .page-head p { font-size: .85rem; color: var(--text-muted); margin-top: 2px; }
 
@@ -501,6 +513,64 @@
     .day-range-chip { padding: 0 14px; gap: 8px; }
     .day-range-chip input { width: 52px; }
     #resetFilters { margin-inline-start: auto; }
+    /* Keep Reset on the same line as the filters: the search box in the filter row is narrower */
+    .filter-bar { gap: 6px; }
+    .filter-bar .filter-chip { padding: 0 8px; gap: 5px; }
+    .filter-bar .search-bar { flex: 0 1 170px; min-width: 120px; max-width: 180px; }
+    .filter-bar #resetFilters { flex: 0 0 auto; white-space: nowrap; margin-inline-start: 4px; }
+    /* Overview top row: Sales Mix and Manager Performance side by side (Store Movers moved below) */
+    #overviewExtras { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; }
+    #overviewExtras > .chart-card { display: flex; flex-direction: column; background: transparent; border: none; box-shadow: none; padding: 4px 6px; }
+    #overviewExtras > .chart-card:not(:first-child) { border-left: 1.5px solid #94a3b8; border-radius: 2px; padding-left: 18px; }
+    /* KPI cards are back to the card style, with a light tint of each card's colour */
+    #kpiPanel { position: static; border: none; padding: 0; margin-bottom: 16px; }
+    #kpiPanel::before, #kpiPanel::after { content: none; }
+    #kpiPanel > .kpi-card { background: color-mix(in srgb, var(--kpi-c, var(--primary)) 8%, var(--surface)); }
+    /* Same short side lines for the row of three charts */
+    #overviewExtras { position: relative; padding: 14px 0; }
+    #overviewExtras::before, #overviewExtras::after { content: ''; position: absolute; top: 10px; bottom: 18px; width: 1px; background: #94a3b8; }
+    #overviewExtras::before { left: 0; }
+    #overviewExtras::after { right: 0; }
+    #overviewExtras .chart-container { height: 300px !important; }
+    #overviewExtras .chart-card > div:not(.chart-container) { flex: 1; }
+    /* Sales and Wastage upload buttons are hidden; files load from the database and drag-and-drop still works */
+    .topbar-left .upload-group { display: none !important; }
+    /* Actions button and its menu */
+    .sidebar .dd-wrap { margin: 0 12px 10px; }
+    .sidebar .tools-btn { width: 100%; height: 38px; justify-content: flex-start; background: transparent; border-color: var(--sb-border); color: var(--sb-text); }
+    .sidebar .tools-btn:hover, .sidebar .tools-btn[aria-expanded="true"] { background: var(--sb-hover); color: var(--sb-text-hover); }
+    .sidebar .tools-btn i { color: inherit; width: 22px; text-align: center; }
+    html.sb-collapsed .sidebar .tools-btn { justify-content: center; padding: 0; }
+    .sidebar .tools-panel { position: fixed; top: auto; bottom: 16px; left: calc(var(--sb-w) + 8px); inset-inline-end: auto; }
+    .sidebar .tools-panel .dropdown-panel { top: 0; inset-inline-end: auto; left: calc(100% + 8px); }
+    .tools-btn { height: 34px; padding: 0 12px; border-radius: 8px; border: 0.5px solid var(--border-strong); background: var(--surface); color: var(--text-main); font-size: .84rem; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap; transition: background .18s var(--ease); }
+    .tools-btn:hover, .tools-btn[aria-expanded="true"] { background: var(--surface-hover); }
+    .tools-btn i { color: var(--text-muted); }
+    .tools-panel { position: absolute; top: calc(100% + 8px); inset-inline-end: 0; width: 240px; background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: 12px; box-shadow: var(--shadow-lg); padding: 6px; display: none; flex-direction: column; z-index: 300; animation: dropIn .16s var(--ease); }
+    .tools-panel.open { display: flex; }
+    .tool-item { display: flex; align-items: center; gap: 10px; width: 100%; height: 36px; padding: 0 10px; border: none; background: transparent; color: var(--text-main); border-radius: 8px; font-size: .85rem; text-align: start; cursor: pointer; white-space: nowrap; }
+    .tool-item i { width: 18px; text-align: center; color: var(--text-muted); font-size: .9rem; }
+    .tool-item:hover { background: var(--surface-hover); }
+    .tool-item kbd { margin-inline-start: auto; font-size: .7rem; }
+    .tool-sep { height: 0.5px; background: var(--border); margin: 5px 6px; }
+    .tools-panel .dd-wrap { display: block; }
+    .tools-panel .dropdown-panel { top: 0; inset-inline-end: calc(100% + 8px); }
+    /* Header polish: one icon style, one control height, quieter filters (colour only when a filter is active) */
+    .topbar-right { gap: 4px; }
+    .topbar-right .icon-btn { width: 34px; height: 34px; border-radius: 8px; color: var(--text-muted); }
+    .topbar-right .icon-btn:hover { color: var(--text-main); background: var(--surface-hover); }
+    .topbar-right .v-divider { margin: 0 6px; }
+    .upload-btn, .filter-chip, .day-range-chip, .search-bar input, .btn-outline { height: 36px; }
+    .filter-chip { background: transparent; border-color: var(--border-strong); }
+    .filter-chip:hover, .day-range-chip:hover { background: var(--surface-hover); }
+    .filter-chip.active { background: var(--primary-light); border-color: var(--primary); }
+    .filter-chip.active .chip-value { color: var(--primary); }
+    .day-range-chip { background: transparent; }
+    .search-bar input { background: transparent; }
+    .page-head h2 { letter-spacing: -0.3px; }
+    /* Detailed table: tighter cells so every column, including wastage, fits on one screen */
+    #dataTable th, #dataTable td { padding-inline: 6px; }
+    #dataTable th.col-store, #dataTable td.col-store { max-width: 190px; }
 
     /* ============ KPI CARDS: leaf-shaped cards with an accent edge, icon medallion and a target ring ============ */
     .kpi-card { border-radius: 16px 16px 16px 6px; border-inline-start: 4px solid var(--kpi-c, var(--primary)); padding: 11px 13px 10px; }
@@ -519,18 +589,19 @@
 
     /* ============ GREEN AND GOLD THEME (a palette on top of the dark theme) ============ */
     [data-theme="dark"][data-palette="emerald"] {
-      --bg: #06231c; --surface: #0b2e25; --surface-hover: #103a2f;
-      --text-main: #f3efe2; --text-muted: #b9c7bd; --text-light: #7f978a;
-      --border: #164236; --border-strong: #1f5546;
-      --primary: #d4af37; --primary-hover: #e3c35a; --primary-light: rgba(212,175,55,.14);
-      --accent: #e8c874; --accent-light: rgba(232,200,116,.14);
-      --success: #5fd39a; --success-light: rgba(95,211,154,.13);
-      --danger: #f08a7c; --danger-light: rgba(240,138,124,.13);
-      --warning: #e8b04a; --warning-light: rgba(232,176,74,.14);
-      --waste: #f08a7c; --waste-light: rgba(240,138,124,.13); --waste-dark: #f6b3aa;
-      --sb-bg: #051d17; --sb-text: #a9bcaf; --sb-text-hover: #ffffff; --sb-hover: rgba(212,175,55,.08); --sb-border: #123a2f;
-      --bg-glass: rgba(6,35,28,.92); --ring: rgba(212,175,55,.3);
-      --h-2025: #123a3a; --h-prev: #2e3320; --h-2026: #0f3d2c; --h-ratios: #1c3a35; --h-waste: #3a2a22; --subtotal-bg: #103a2f;
+      /* Deep forest green with warm gold accents. Text is near-white for easy reading. */
+      --bg: #071a13; --surface: #0c2419; --surface-hover: #12301f;
+      --text-main: #f2f7f3; --text-muted: #b5c9bc; --text-light: #8aa596;
+      --border: #1a3a2a; --border-strong: #26503b;
+      --primary: #e2b93b; --primary-hover: #efcb5c; --primary-light: rgba(226,185,59,.14);
+      --accent: #f0cf72; --accent-light: rgba(240,207,114,.14);
+      --success: #4fd08d; --success-light: rgba(79,208,141,.14);
+      --danger: #ff8a7a; --danger-light: rgba(255,138,122,.14);
+      --warning: #f2b84b; --warning-light: rgba(242,184,75,.15);
+      --waste: #ff8a7a; --waste-light: rgba(255,138,122,.14); --waste-dark: #ffb8ad;
+      --sb-bg: #04140e; --sb-text: #b5c9bc; --sb-text-hover: #ffffff; --sb-hover: rgba(226,185,59,.09); --sb-border: #15331f;
+      --bg-glass: rgba(7,26,19,.92); --ring: rgba(226,185,59,.32);
+      --h-2025: #14363a; --h-prev: #33301a; --h-2026: #113a28; --h-ratios: #1f3a36; --h-waste: #3a2a20; --subtotal-bg: #13321f;
     }
     [data-palette="emerald"] .brand-mark { background: linear-gradient(135deg, #e3c35a, #b8922a); color: #06231c; }
 
@@ -697,10 +768,6 @@
       <button class="icon-btn ghost" id="sidebarToggle" title="Toggle menu" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
       <h1><span class="title-text">Sales Intelligence</span> <span class="badge" id="rowCountBadge">No data</span></h1>
       <div class="v-divider"></div>
-      <div class="search-bar">
-        <i class="fas fa-search"></i>
-        <input type="text" id="globalSearch" placeholder="Search records…  ( / )" autocomplete="off" aria-label="Search records">
-      </div>
       <div class="upload-group">
         <input type="file" id="fileInput" accept=".xlsx, .xls, .csv" style="display:none;">
         <input type="file" id="wastageInput" accept=".xlsx, .xls" style="display:none;">
@@ -710,22 +777,6 @@
     </div>
 
     <div class="topbar-right">
-      <button class="icon-btn" id="askBtn" title="Ask your data" aria-label="Ask your data"><i class="fas fa-wand-magic-sparkles"></i></button>
-      <button class="icon-btn" id="quickFindBtn" title="Quick find (Ctrl+K)" aria-label="Quick find"><i class="fas fa-bolt"></i></button>
-      <button class="icon-btn hide-xs" id="langBtn" title="Toggle layout direction (LTR / RTL)"><i class="fas fa-language"></i></button>
-      <button class="icon-btn hide-xs" id="helpBtn" title="Help & Shortcuts"><i class="fas fa-question"></i></button>
-      <button class="icon-btn" id="qualityBtn" title="Data Quality"><i class="fas fa-clipboard-check"></i></button>
-      <div class="v-divider"></div>
-      <div class="dd-wrap">
-        <button class="icon-btn" id="saveViewBtn" title="Saved Views"><i class="fas fa-bookmark"></i></button>
-        <div class="dropdown-panel" id="saveViewMenu">
-          <div class="dropdown-head">
-            <h4>Saved Views</h4>
-            <button class="link-btn" id="saveCurrentView">+ Save Current</button>
-          </div>
-          <div class="dropdown-body" id="savedViewsList"></div>
-        </div>
-      </div>
       <div class="dd-wrap">
         <button class="icon-btn" id="notifBtn" title="Notifications">
           <i class="fas fa-bell"></i>
@@ -740,18 +791,44 @@
         </div>
       </div>
       <span id="userBadge" style="font-size:12px;color:var(--text-muted);align-self:center;white-space:nowrap;"></span>
-      <button class="icon-btn" id="syncBtn" title="Sync loaded files to database (admin)" aria-label="Sync to database" style="display:none"><i class="fas fa-database"></i></button>
+      <div class="dd-wrap">
+        <button class="tools-btn" id="toolsBtn" aria-haspopup="true" aria-expanded="false"><i class="fas fa-gear"></i><span class="nav-label">Actions</span></button>
+        <div class="tools-panel" id="toolsPanel" role="menu">
+          <button class="tool-item" id="askBtn" role="menuitem"><i class="fas fa-wand-magic-sparkles"></i><span>Ask your data</span></button>
+          <button class="tool-item" id="quickFindBtn" role="menuitem"><i class="fas fa-bolt"></i><span>Quick find</span><kbd>Ctrl K</kbd></button>
+          <div class="dd-wrap">
+            <button class="tool-item" id="saveViewBtn" role="menuitem"><i class="fas fa-bookmark"></i><span>Saved views</span></button>
+            <div class="dropdown-panel" id="saveViewMenu">
+              <div class="dropdown-head">
+                <h4>Saved Views</h4>
+                <button class="link-btn" id="saveCurrentView">+ Save Current</button>
+              </div>
+              <div class="dropdown-body" id="savedViewsList"></div>
+            </div>
+          </div>
+          <button class="tool-item" id="calcBtn" role="menuitem"><i class="fas fa-calculator"></i><span>Calculator</span></button>
+          <div class="tool-sep"></div>
+          <button class="tool-item" id="pwBtn" role="menuitem"><i class="fas fa-key"></i><span>Change password</span></button>
+          <button class="tool-item" id="syncBtn" role="menuitem" style="display:none"><i class="fas fa-database"></i><span>Sync to database</span></button>
+          <div class="tool-sep"></div>
+          <button class="tool-item" id="langBtn" role="menuitem"><i class="fas fa-language"></i><span>Layout direction</span></button>
+          <button class="tool-item" id="helpBtn" role="menuitem"><i class="fas fa-question"></i><span>Help and shortcuts</span></button>
+          <button class="tool-item" id="qualityBtn" role="menuitem"><i class="fas fa-clipboard-check"></i><span>Data quality</span></button>
+          <button class="tool-item" id="themeToggle" role="menuitem"><i class="fas fa-moon"></i><span>Theme</span></button>
+        </div>
+      </div>
       <button class="icon-btn" id="logoutBtn" title="Sign out" aria-label="Sign out"><i class="fas fa-right-from-bracket"></i></button>
-      <button class="icon-btn" id="themeToggle" title="Toggle theme (D)"><i class="fas fa-moon"></i></button>
     </div>
   </header>
 
   <div class="page-head">
     <div>
       <h2 id="pageTitle">Overview</h2>
-      <p id="pageSub">Top stores, manager performance and the monthly trend.</p>
+      <div class="page-sub-line">
+        <p id="pageSub">Top stores, manager performance and the monthly trend.</p>
+        <div class="period-chip" id="periodChip"><i class="fas fa-calendar-check"></i><span id="periodChipText"></span></div>
+      </div>
     </div>
-    <div class="period-chip" id="periodChip"><i class="fas fa-calendar-check"></i><span id="periodChipText"></span></div>
   </div>
 
   <!-- FILTER BAR -->
@@ -827,6 +904,10 @@
         <input type="number" id="dayFrom" placeholder="1" min="1" max="31" value="1" aria-label="From day">
         <span class="dash">–</span>
         <input type="number" id="dayTo" placeholder="31" min="1" max="31" value="31" aria-label="To day">
+      </div>
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="globalSearch" placeholder="Search records…  ( / )" autocomplete="off" aria-label="Search records">
       </div>
     </div>
     <div class="filter-actions">
@@ -1398,6 +1479,57 @@
   </div>
 </div>
 
+<!-- CALCULATOR -->
+<div class="modal-overlay" id="calcModal">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-label="Calculator" style="max-width:300px;">
+    <div class="modal-head">
+      <h3><i class="fas fa-calculator"></i> Calculator</h3>
+      <button class="modal-close" id="calcClose" aria-label="Close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body padded">
+      <div id="calcDisplay" style="text-align:right;font-size:1.7rem;font-weight:700;padding:10px 12px;margin-bottom:12px;border-radius:10px;background:var(--bg);border:1px solid var(--border-strong);min-height:52px;overflow:hidden;white-space:nowrap;font-variant-numeric:tabular-nums;">0</div>
+      <div id="calcPad" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+        <button class="btn btn-outline" data-k="C">C</button>
+        <button class="btn btn-outline" data-k="back">⌫</button>
+        <button class="btn btn-outline" data-k="%">%</button>
+        <button class="btn btn-outline" data-k="/">÷</button>
+        <button class="btn btn-outline" data-k="7">7</button>
+        <button class="btn btn-outline" data-k="8">8</button>
+        <button class="btn btn-outline" data-k="9">9</button>
+        <button class="btn btn-outline" data-k="*">×</button>
+        <button class="btn btn-outline" data-k="4">4</button>
+        <button class="btn btn-outline" data-k="5">5</button>
+        <button class="btn btn-outline" data-k="6">6</button>
+        <button class="btn btn-outline" data-k="-">−</button>
+        <button class="btn btn-outline" data-k="1">1</button>
+        <button class="btn btn-outline" data-k="2">2</button>
+        <button class="btn btn-outline" data-k="3">3</button>
+        <button class="btn btn-outline" data-k="+">+</button>
+        <button class="btn btn-outline" data-k="0" style="grid-column:span 2;">0</button>
+        <button class="btn btn-outline" data-k=".">.</button>
+        <button class="btn btn-primary" data-k="=">=</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL (the new password is saved to the user's sign-in in Supabase) -->
+<div class="modal-overlay" id="pwModal">
+  <div class="modal-box dialog-box" role="dialog" aria-modal="true" aria-label="Change password">
+    <div class="dialog-body">
+      <h3>Change password</h3>
+      <p>Enter a new password of at least 8 characters. You will use it the next time you sign in.</p>
+      <input type="password" id="pwNew" autocomplete="new-password" placeholder="New password" style="margin-bottom:8px;">
+      <input type="password" id="pwNew2" autocomplete="new-password" placeholder="Repeat new password">
+      <div class="dialog-error" id="pwErr"></div>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-outline" id="pwCancel" type="button">Cancel</button>
+      <button class="btn btn-primary" id="pwSave" type="button">Save password</button>
+    </div>
+  </div>
+</div>
+
 <!-- HELP MODAL -->
 <div class="view-menu" id="viewMenu" role="menu" aria-label="Table view options">
   <div class="menu-h">Columns (Detailed)</div>
@@ -1785,7 +1917,7 @@ function applyTheme() {
   if (t === 'emerald') root.setAttribute('data-palette', 'emerald'); else root.removeAttribute('data-palette');
   safeSet('theme', t);
   const toggleBtn = $('themeToggle');
-  if (toggleBtn) { toggleBtn.innerHTML = `<i class="fas ${{ light: 'fa-moon', dark: 'fa-leaf', emerald: 'fa-sun' }[t]}"></i>`; toggleBtn.title = `Theme: ${THEME_NAMES[t]} - click to change (D)`; }
+  if (toggleBtn) { toggleBtn.innerHTML = `<i class="fas ${{ light: 'fa-moon', dark: 'fa-leaf', emerald: 'fa-sun' }[t]}"></i><span>Theme: ${THEME_NAMES[t]}</span>`; toggleBtn.title = `Theme: ${THEME_NAMES[t]} - click to change (D)`; }
   applyChartTheme();
 }
 function toggleTheme(withToast) {
@@ -1863,7 +1995,12 @@ function switchTab(tabName) {
   if (tabName === 'wastage') $('kpiPanel').style.display = 'none';
   else if (hasSales) $('kpiPanel').style.display = 'grid';
 
-  if ($('wastageEmpty')) $('wastageEmpty').style.display = (tabName === 'wastage' && !hasWastage) ? 'block' : 'none';
+  // Wastage not loaded yet: start the load (it is shared, so this never downloads twice)
+  if (tabName === 'wastage' && !hasWastage && hasSales && window.__loadWastageOnDemand) {
+    window.__loadWastageOnDemand();
+  }
+
+  if ($('wastageEmpty')) $('wastageEmpty').style.display = (tabName === 'wastage' && !hasWastage && !window.__wastageLoading) ? 'block' : 'none';
 
   // On phones/tablets the drawer closes after choosing a page
   if (isMobileLayout()) closeMobileSidebar();
@@ -1969,6 +2106,33 @@ document.addEventListener('click', e => {
   if (!e.target.closest('#saveViewBtn') && !e.target.closest('#saveViewMenu')) $('saveViewMenu').classList.remove('open');
 });
 $('notifBtn').addEventListener('click', e => { e.stopPropagation(); $('notifPanel').classList.toggle('open'); $('saveViewMenu').classList.remove('open'); });
+// ===== TOOLS MENU (opens from the Tools button in the top bar) =====
+// The page title and the period box are shown on the top bar, right after the divider
+(function () {
+  const vdiv = document.querySelector('.topbar-left .v-divider');
+  const title = $('pageTitle'), chip = $('periodChip');
+  if (vdiv && title && chip) vdiv.after(title, chip);
+  // The stores and rows count lives in the notifications panel, under its heading
+  const badge = $('rowCountBadge'), notifHead = document.querySelector('#notifPanel .dropdown-head');
+  if (badge && notifHead) notifHead.after(badge);
+})();
+const toolsBtn = $('toolsBtn'), toolsPanel = $('toolsPanel');
+// The Actions button lives at the bottom of the navigation panel, below the footer line
+document.querySelector('.sidebar-foot').after(toolsBtn.parentElement);
+function closeTools() { toolsPanel.classList.remove('open'); toolsBtn.setAttribute('aria-expanded', 'false'); }
+toolsBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  const open = toolsPanel.classList.toggle('open');
+  toolsBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  $('notifPanel').classList.remove('open');
+});
+toolsPanel.addEventListener('click', e => {
+  const item = e.target.closest('.tool-item');
+  if (item && item.id !== 'saveViewBtn') closeTools();   // Saved views keeps its own dropdown open
+});
+document.addEventListener('click', e => { if (!e.target.closest('#toolsPanel') && !e.target.closest('#toolsBtn')) closeTools(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTools(); });
+
 $('clearNotif').addEventListener('click', () => { notifications = []; renderNotifs(); $('notifPanel').classList.remove('open'); });
 $('saveViewBtn').addEventListener('click', e => { e.stopPropagation(); $('saveViewMenu').classList.toggle('open'); $('notifPanel').classList.remove('open'); });
 renderNotifs();
@@ -2811,7 +2975,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     // Period chip in the page header
     const selMonths = [...FilterState.month.selected].map(Number);
     const oneMonth = selMonths.length === 1 && FilterState.month.options.length > 1 ? MONTHS[selMonths[0] - 1] + ' ' : '';
-    $('periodChipText').innerHTML = CY != null ? `<strong>${oneMonth}${CY}</strong> compared with <strong>${oneMonth}${LY}</strong>` : '';
+    $('periodChipText').innerHTML = CY != null ? `<strong>${oneMonth}${String(CY).slice(-2)}</strong> vs <strong>${oneMonth}${String(LY).slice(-2)}</strong>` : '';
     $('periodChip').style.display = CY != null ? 'inline-flex' : 'none';
 
     const monthly = new Map();
@@ -2893,11 +3057,37 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     dashboardEl.classList.toggle('no-match', filteredData.length === 0);
 
     updateKPIs(filteredData);
+    window.__dbStoreMonth = null; // database figures belong to the previous filter until the new ones arrive
+    window.__dbPrevMap = null;
     renderActiveTab();
     // Lets add-on views (3-month comparison) refresh after every filter change
     document.dispatchEvent(new CustomEvent('dashboard:filtered'));
   }
   window.applyFiltersAndRender = applyFiltersAndRender;
+
+  // Filter arguments for the database overview_totals function, built from the same filter state the page uses.
+  // Returns null when the page is in a mode the function does not cover (search text, LFL-only, ADS).
+  // Years the Year filter currently allows (used by the Detailed check)
+  window.__yearsSelected = function () { return [...FilterState.year.selected].map(Number); };
+  window.__overviewFilterParams = function () {
+    if (globalSearchTerm || lflOnly || adsMode) return null;
+    const ctx = getMonthContext();
+    const narrowed = (key) => { const sel = [...FilterState[key].selected]; return sel.length && sel.length !== FilterState[key].options.length ? sel : null; };
+    const selY = narrowed('year');
+    if (selY && !selY.map(Number).includes(ctx.curY)) return null;
+    const num = (a) => a ? a.map(Number) : null;
+    return {
+      p_years: [ctx.curY],
+      p_months: num(narrowed('month')),
+      p_day_from: dayFrom.value ? parseInt(dayFrom.value) : 1,
+      p_day_to: dayTo.value ? parseInt(dayTo.value) : 31,
+      p_stores: narrowed('store'),
+      p_areas: narrowed('area'),
+      p_segments: narrowed('segment'),
+      p_formats: narrowed('format'),
+      p_dows: num(narrowed('dow'))
+    };
+  };
 
   resetFilters.addEventListener('click', () => {
     if (!rawData.length) { showToast('Nothing to reset yet', 'info'); return; }
@@ -3599,7 +3789,29 @@ function getMaxDayForMonth(targetYear, targetMonth) {
   });
 
   // ===== OVERVIEW: segment mix, manager target achievement, store movers =====
-  let segmentChartInstance;
+  let segmentChartInstance, managerShareInst, formatShareInst;
+  const SHARE_COLORS = ['#2563eb', '#7c3aed', '#0d9488', '#ea580c', '#dc2626', '#db2777', '#65a30d', '#0891b2'];
+  // Writes each slice's percentage on the ring (slices under 5% are left unlabelled)
+  function sharePctPlugin(vals, sum) {
+    return {
+      id: 'sharePct',
+      afterDatasetsDraw(chart) {
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.fillStyle = '#fff';
+        ctx.font = "700 11px 'Inter', sans-serif";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        chart.getDatasetMeta(0).data.forEach((arc, i) => {
+          const share = sum > 0 ? vals[i] / sum * 100 : 0;
+          if (share < 5) return;
+          const p = arc.tooltipPosition();
+          ctx.fillText(`${share.toFixed(0)}%`, p.x, p.y);
+        });
+        ctx.restore();
+      }
+    };
+  }
   function renderOverviewExtras(data, sAgg, aAgg) {
     $('overviewExtras').style.display = 'grid';
 
@@ -3610,6 +3822,8 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     const segTotal = segArr.reduce((s, e) => s + e[1], 0);
     const palette = ['#3b82f6', '#8b5cf6', '#14b8a6', '#f59e0b', '#ef4444', '#64748b', '#ec4899', '#84cc16'];
     if (segmentChartInstance) segmentChartInstance.destroy();
+    // The segment card is redrawn as text each time, so put its canvas back before drawing the chart
+    if (!$('segmentChart') && $('segmentShareBox')) $('segmentShareBox').innerHTML = '<canvas id="segmentChart"></canvas>';
     const centerText = {
       id: 'centerText',
       afterDraw(chart) {
@@ -3643,12 +3857,29 @@ function getMaxDayForMonth(targetYear, targetMonth) {
       plugins: [centerText]
     });
 
-    // Target achievement per manager (current-year sales vs prorated target)
-    const ach = aAgg.filter(a => a.target > 0).map(a => ({ name: a.area, pct: a.net2026 / a.target * 100 })).sort((a, b) => b.pct - a.pct).slice(0, 8);
-    $('managerAchList').innerHTML = ach.length ? ach.map(a => {
-      const cls = a.pct >= 100 ? 'ok' : a.pct >= 80 ? 'mid' : 'low';
-      return `<div class="ach-row"><div class="ach-name" title="${escapeAttr(a.name)}">${escapeHtml(a.name)}</div><div class="ach-bar"><span class="${cls}" style="width:${Math.max(2, Math.min(100, a.pct)).toFixed(0)}%"></span></div><div class="ach-pct ${cls}">${a.pct.toFixed(0)}%</div></div>`;
-    }).join('') : '<p class="muted-note">No targets in the selected data.</p>';
+    // Sales share by manager (current year), drawn as a doughnut like the segment chart
+    const mgrRows = aAgg.map(a => ({ name: a.area, sales: a.net2026 })).filter(m => m.sales > 0).sort((a, b) => b.sales - a.sales);
+    const mgrSum = mgrRows.reduce((s, m) => s + m.sales, 0);
+    const mgrCard = $('managerAchList').closest('.chart-card');
+    if (mgrCard) mgrCard.querySelector('h3').innerHTML = '<i class="fas fa-user-tie"></i> Sales share by manager';
+    if (managerShareInst) { managerShareInst.destroy(); managerShareInst = null; }
+    if (mgrRows.length) {
+      $('managerAchList').innerHTML = '<div class="chart-container" style="height:300px;"><canvas id="managerShareChart"></canvas></div>';
+      managerShareInst = new Chart($('managerShareChart').getContext('2d'), {
+        type: 'doughnut',
+        data: { labels: mgrRows.map(m => m.name), datasets: [{ data: mgrRows.map(m => m.sales), backgroundColor: mgrRows.map((_, i) => SHARE_COLORS[i % SHARE_COLORS.length]), borderColor: cssVar('--surface') || '#fff', borderWidth: 3, hoverOffset: 6 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: '66%',
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 8, boxHeight: 8, padding: 12, font: { size: 11, weight: '600' } } },
+            tooltip: { callbacks: { label: c => `${mgrRows[c.dataIndex].name}: ${fmtCur(c.raw)} (${(c.raw / mgrSum * 100).toFixed(1)}%)` } }
+          }
+        },
+        plugins: [sharePctPlugin(mgrRows.map(m => m.sales), mgrSum)]
+      });
+    } else {
+      $('managerAchList').innerHTML = '<p class="muted-note">No sales for this year in the current filters.</p>';
+    }
 
     // Stores with the highest and lowest year-over-year growth
     const mv = sAgg.filter(s => s.net2025 > 0 && s.net2026 > 0).map(s => ({ name: s.store, g: s.net2026 / s.net2025 - 1 })).sort((a, b) => b.g - a.g);
@@ -3657,6 +3888,122 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     $('moversUp').innerHTML = mv.length ? mv.slice(0, 4).map(row).join('') : none;
     const bottom = mv.slice(Math.max(4, mv.length - 4)).reverse();
     $('moversDown').innerHTML = bottom.length ? bottom.map(row).join('') : '<p class="muted-note">Not enough stores to rank.</p>';
+
+    // Store Movers sits below the charts, beside the new Format wise sales % card
+    const moversCard = $('moversUp').closest('.chart-card');
+    // Store Movers card is removed from the page; the data stays in the page code
+    if (moversCard) moversCard.style.display = 'none';
+    const chartsPanel = $('chartsPanel');
+    if (moversCard && chartsPanel && moversCard.parentElement !== chartsPanel) chartsPanel.appendChild(moversCard);
+    let fmtCard = $('formatShareCard');
+    const topRow = $('overviewExtras');
+    if (!fmtCard && topRow) {
+      fmtCard = document.createElement('div');
+      fmtCard.className = 'chart-card';
+      fmtCard.id = 'formatShareCard';
+      fmtCard.innerHTML = '<h3><i class="fas fa-building"></i> Format wise sales %</h3><div id="formatShareList"></div>';
+      topRow.appendChild(fmtCard);
+    }
+    // Share of current-year sales by format
+    const fmtTotals = new Map();
+    data.forEach(r => { if (r.year !== CY) return; const k = r.format || 'UNMAPPED'; fmtTotals.set(k, (fmtTotals.get(k) || 0) + r.net); });
+    const fmtRows = [...fmtTotals.entries()].filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
+    const fmtSum = fmtRows.reduce((s, e) => s + e[1], 0);
+    // Format share drawn as a doughnut, the same style as the segment and manager charts
+    const fmtBox = $('formatShareList');
+    if (formatShareInst) { formatShareInst.destroy(); formatShareInst = null; }
+    if (fmtBox && fmtRows.length) {
+      fmtBox.innerHTML = '<div class="chart-container" style="height:300px;"><canvas id="formatShareChart"></canvas></div>';
+      formatShareInst = new Chart($('formatShareChart').getContext('2d'), {
+        type: 'doughnut',
+        data: { labels: fmtRows.map(e => e[0]), datasets: [{ data: fmtRows.map(e => e[1]), backgroundColor: fmtRows.map((_, i) => SHARE_COLORS[i % SHARE_COLORS.length]), borderColor: cssVar('--surface') || '#fff', borderWidth: 3, hoverOffset: 6 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: '66%',
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 8, boxHeight: 8, padding: 10, font: { size: 10, weight: '600' } } },
+            tooltip: { callbacks: { label: c => `${fmtRows[c.dataIndex][0]}: ${fmtCur(c.raw)} (${(c.raw / fmtSum * 100).toFixed(1)}%)` } }
+          }
+        },
+        plugins: [sharePctPlugin(fmtRows.map(e => e[1]), fmtSum)]
+      });
+    } else if (fmtBox) {
+      fmtBox.innerHTML = '<p class="muted-note">No sales for this year in the current filters.</p>';
+    }
+
+    // Segment, manager and format share one card design: a total, a proportion bar and a ranked list
+    // style: 'gauge' (half ring, pill markers), 'ring' (segmented ring, diamond markers), 'hex' (hexagon, circle markers)
+    const markerOf = (style, c) => style === 'gauge'
+      ? `<span style="width:16px;height:6px;border-radius:999px;background:${c};"></span>`
+      : style === 'ring'
+        ? `<span style="width:8px;height:8px;background:${c};transform:rotate(45deg);"></span>`
+        : `<span style="width:10px;height:10px;border-radius:50%;background:${c};"></span>`;
+    const shareCard = (label, items, style) => {
+      const sum = items.reduce((s, i) => s + i.value, 0) || 1;
+      const top = items.slice(0, 4), rest = items.slice(4);
+      const restVal = rest.reduce((s, i) => s + i.value, 0);
+      const list = items; // every item is shown, no "Others" group
+      const centreText = `<span style="font-size:14px;font-weight:600;color:var(--text-primary);">${fmtCur(sum)}</span>
+          <span style="font-size:10px;color:var(--text-secondary);letter-spacing:0.4px;text-transform:uppercase;margin-top:2px;">${escapeHtml(label)}</span>`;
+      let pie = '';
+      if (style === 'gauge') {
+        // Half ring along the top semicircle; the total sits under the arc
+        const SEMI = Math.PI * 80, PATH = 'M20,100 A80,80 0 0,1 180,100';
+        let gAcc = 0;
+        const gSegs = list.map(i => { const len = i.value / sum * SEMI; const s = `<path d="${PATH}" fill="none" stroke="${i.color}" stroke-width="18" stroke-dasharray="${len.toFixed(2)} ${(SEMI * 2).toFixed(2)}" stroke-dashoffset="${(-gAcc).toFixed(2)}"/>`; gAcc += len; return s; }).join('');
+        pie = `<div style="position:relative;width:180px;height:112px;margin:4px auto 18px;">
+          <svg viewBox="0 0 200 112" width="180" height="112" aria-hidden="true" style="display:block;"><path d="${PATH}" fill="none" stroke="var(--border)" stroke-width="18"/>${gSegs}</svg>
+          <div style="position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;">${centreText}</div></div>`;
+      } else if (style === 'ring') {
+        // Segmented ring with a small gap between items
+        const C = 2 * Math.PI * 80, GAP = 6;
+        let rAcc = 0;
+        const rSegs = list.map(i => { const len = i.value / sum * C; const drawn = Math.max(len - GAP, 0); const s = `<circle cx="100" cy="100" r="80" fill="none" stroke="${i.color}" stroke-width="16" stroke-dasharray="${drawn.toFixed(2)} ${(C - drawn).toFixed(2)}" stroke-dashoffset="${(-rAcc - GAP / 2).toFixed(2)}" transform="rotate(-90 100 100)"/>`; rAcc += len; return s; }).join('');
+        pie = `<div style="position:relative;width:160px;height:160px;margin:4px auto 16px;">
+          <svg viewBox="0 0 200 200" width="160" height="160" aria-hidden="true" style="display:block;">${rSegs}</svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">${centreText}</div></div>`;
+      } else {
+        // Hexagon: the outline is split into coloured sections, one per item
+        const HEX = [[100, 22], [170, 62], [170, 138], [100, 178], [30, 138], [30, 62]];
+        const HEX_PTS = HEX.map(p => p.join(',')).join(' ');
+        const HEX_LEN = HEX.reduce((s, p, k) => { const q = HEX[(k + 1) % HEX.length]; return s + Math.hypot(q[0] - p[0], q[1] - p[1]); }, 0);
+        let hAcc = 0;
+        const hSegs = list.map(i => { const len = i.value / sum * HEX_LEN; const s = `<polygon points="${HEX_PTS}" fill="none" stroke="${i.color}" stroke-width="12" stroke-linejoin="round" stroke-dasharray="${len.toFixed(2)} ${(HEX_LEN - len).toFixed(2)}" stroke-dashoffset="${(-hAcc).toFixed(2)}"/>`; hAcc += len; return s; }).join('');
+        pie = `<div style="position:relative;width:160px;height:160px;margin:4px auto 16px;">
+          <svg viewBox="0 0 200 200" width="160" height="160" aria-hidden="true" style="display:block;"><polygon points="${HEX_PTS}" fill="none" stroke="var(--border)" stroke-width="12" stroke-linejoin="round"/>${hSegs}</svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">${centreText}</div></div>`;
+      }
+      const rows = list.map(i => `<div style="display:grid;grid-template-columns:18px 1fr auto auto;gap:10px;align-items:center;font-size:13px;">
+          <span style="width:18px;display:flex;align-items:center;justify-content:center;">${markerOf(style, i.color)}</span>
+          <span style="color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(i.name)}</span>
+          <span style="color:var(--text-secondary);">${fmtCur(i.value)}</span>
+          <span style="color:var(--text-primary);font-weight:500;min-width:48px;text-align:end;">${(i.value / sum * 100).toFixed(1)}%</span></div>`).join('');
+      return `<div style="padding:4px 2px;">
+        <div style="font-size:12px;color:var(--text-secondary);">${escapeHtml(label)}</div>
+                ${pie}
+        <div style="display:grid;gap:12px;">${rows}</div></div>`;
+    };
+    const ranked = (rowsIn) => rowsIn.filter(e => e.value > 0).sort((a, b) => b.value - a.value).map((e, i) => ({ name: e.name, value: e.value, color: SHARE_COLORS[i % SHARE_COLORS.length] }));
+    if (segmentChartInstance) { segmentChartInstance.destroy(); segmentChartInstance = null; }
+    if (managerShareInst) { managerShareInst.destroy(); managerShareInst = null; }
+    if (formatShareInst) { formatShareInst.destroy(); formatShareInst = null; }
+
+    const segMap = new Map();
+    data.forEach(r => { if (r.year !== CY) return; const k = r.segment || 'UNMAPPED'; segMap.set(k, (segMap.get(k) || 0) + r.net); });
+    const segItems = ranked([...segMap.entries()].map(e => ({ name: e[0], value: e[1] })));
+    let segBox = $('segmentShareBox');
+    if (!segBox && $('segmentChart')) {
+      segBox = $('segmentChart').closest('.chart-container');
+      segBox.id = 'segmentShareBox';
+      const dl = segBox.closest('.chart-card').querySelector('.chart-download-btn');
+      if (dl) dl.style.display = 'none';
+    }
+    if (segBox) segBox.innerHTML = segItems.length ? shareCard('Sales by segment', segItems, 'gauge') : '<p class="muted-note">No sales for this year.</p>';
+
+    const mgrItems = ranked(aAgg.map(a => ({ name: a.area, value: a.net2026 })));
+    $('managerAchList').innerHTML = mgrItems.length ? shareCard('Sales by manager', mgrItems, 'ring') : '<p class="muted-note">No sales for this year.</p>';
+
+    const fmtItems = ranked(fmtRows.map(e => ({ name: e[0], value: e[1] })));
+    if (fmtBox) fmtBox.innerHTML = fmtItems.length ? shareCard('Sales by format', fmtItems, 'hex') : '<p class="muted-note">No sales for this year.</p>';
   }
 
   // ===== CHARTS =====
@@ -3735,6 +4082,9 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     // --- Top stores: last year and current year as bars, target as a tick mark, YoY growth as a label ---
     const topS = [...sAgg].sort((a,b) => (b.net2026 + b.net2025) - (a.net2026 + a.net2025)).slice(0, 10);
     const growthOf = s => s.net2025 > 0 && s.net2026 > 0 ? (s.net2026 / s.net2025 - 1) * 100 : null;
+    // The modern view replaces these two canvases after drawing, so put them back before each draw
+    if (!$('topStoresChart') && $('storeModernBox')) $('storeModernBox').innerHTML = '<canvas id="topStoresChart"></canvas>';
+    if (!$('areaChart') && $('mgrModernBox')) $('mgrModernBox').innerHTML = '<canvas id="areaChart"></canvas>';
     if (topStoresChartInstance) topStoresChartInstance.destroy();
     topStoresChartInstance = new Chart($('topStoresChart').getContext('2d'), {
       type: 'bar',
@@ -3800,6 +4150,8 @@ function getMaxDayForMonth(targetYear, targetMonth) {
       if (nextIdx >= 0) fData[nextIdx] = forecastVal;
       else { trendLabels.push(nextM != null ? `${MONTHS[nextM - 1]} (forecast)` : 'Next (forecast)'); trendNet26.push(null); trendNet25.push(null); trendTarget.push(null); fData.push(forecastVal); }
     }
+    // The list view replaces this chart after drawing, so put the canvas back before each draw
+    if (!$('monthlyTrendChart') && $('trendListBox')) $('trendListBox').innerHTML = '<canvas id="monthlyTrendChart"></canvas>';
     if (monthlyTrendChartInstance) monthlyTrendChartInstance.destroy();
     const datasets = [
       { label: String(CY), data: trendNet26, borderColor: C.cy, backgroundColor: C.soft, pointBackgroundColor: C.cy, tension: .3, pointRadius: 4, borderWidth: 2.5, fill: true },
@@ -3814,6 +4166,118 @@ function getMaxDayForMonth(targetYear, targetMonth) {
         plugins: { legend: LEGEND, tooltip: { filter: item => item.raw != null && !(item.dataset.label === 'Forecast (trend)' && item.raw !== forecastVal), callbacks: curTooltip.callbacks } },
         scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { callback: v => fmtNum(v) } } } }
     });
+
+    // Modern view: pill bars for top stores and rounded columns for managers, shown in place of the two bar charts
+    if (topStoresChartInstance) { topStoresChartInstance.destroy(); topStoresChartInstance = null; }
+    if (areaChartInstance) { areaChartInstance.destroy(); areaChartInstance = null; }
+    const toneC = p => p >= 100 ? 'var(--success)' : p >= 80 ? 'var(--warning)' : 'var(--danger)';
+    const toneBgC = p => p >= 100 ? 'var(--success-light)' : p >= 80 ? 'var(--warning-light)' : 'var(--danger-light)';
+    // Compare the current month with the previous month (both are loaded, whatever the year filter)
+    const mctx = getMonthContext();
+    const curLbl = `${MONTHS[mctx.curM - 1]} ${mctx.curY}`, prevLbl = `${MONTHS[mctx.prevM - 1]} ${mctx.prevY}`;
+    const sumBy = (rows, key) => { const m = new Map(); rows.forEach(r => m.set(r[key], (m.get(r[key]) || 0) + r.net)); return m; };
+    const curRows = data.filter(r => r.year === mctx.curY && r.month === mctx.curM);
+    const prevRowsNow = window.__prevRows || [];
+    const changeChip = (cur, prev) => {
+      if (!(prev > 0)) return '<span style="font-size:11px;color:var(--text-muted);">no last month</span>';
+      const d = (cur / prev - 1) * 100;
+      return `<span style="font-size:11px;font-weight:500;color:${d >= 0 ? 'var(--success)' : 'var(--danger)'};background:${d >= 0 ? 'var(--success-light)' : 'var(--danger-light)'};padding:2px 8px;border-radius:999px;">${signed(d)}</span>`;
+    };
+
+    // Top stores: this month against last month, top four plus the lowest store with sales
+    const nameOf = new Map(); data.forEach(r => nameOf.set(r.storeCode, r.store));
+    const sCur = sumBy(curRows, 'storeCode'), sPrev = sumBy(prevRowsNow, 'storeCode');
+    const storeMoM = [...new Set([...sCur.keys(), ...sPrev.keys()])]
+      .map(code => ({ store: nameOf.get(code) || code, cur: sCur.get(code) || 0, prev: sPrev.get(code) || 0 }))
+      .filter(s => s.cur > 0).sort((a, b) => b.cur - a.cur);
+    // Top five and bottom five stores side by side, colour coded, with this month against last month
+    const chipOf = (cur, prev) => {
+      if (!(prev > 0)) return '<span style="font-size:11px;color:var(--text-muted);">new</span>';
+      const d = (cur / prev - 1) * 100;
+      return `<span style="font-size:11px;font-weight:500;color:${d >= 0 ? 'var(--success)' : 'var(--danger)'};background:${d >= 0 ? 'var(--success-light)' : 'var(--danger-light)'};padding:2px 7px;border-radius:999px;">${signed(d)}</span>`;
+    };
+    const storeLine = (s, label, color, bg) => `<div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:9px 12px;background:${bg};border-radius:10px;border-left:3px solid ${color};font-size:13px;">
+        <span style="color:var(--text-primary);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${label}${escapeHtml(s.store)}</span>
+        <span style="color:var(--text-primary);font-weight:500;white-space:nowrap;">${fmtCur(s.cur)}</span>${chipOf(s.cur, s.prev)}</div>`;
+    const topFiveS = storeMoM.slice(0, 5);
+    const bottomFiveS = storeMoM.length > 5 ? storeMoM.slice(-5).reverse() : [];
+    const colHead = (t, color) => `<div style="font-size:11px;font-weight:500;letter-spacing:0.5px;text-transform:uppercase;color:${color};margin-bottom:8px;">${t}</div>`;
+    const sCol = (title, titleColor, rows) => `<div style="min-width:0;">${colHead(title, titleColor)}<div style="display:grid;gap:8px;">${rows}</div></div>`;
+    const topRows = topFiveS.map((s, i) => storeLine(s, `#${i + 1} `, SHARE_COLORS[i % SHARE_COLORS.length], 'var(--surface-2)')).join('');
+    const bottomRows = bottomFiveS.map(s => storeLine(s, '', '#94a3b8', 'var(--surface-2)')).join('');
+    const sRows = topFiveS.length
+      ? `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">${sCol('Top 5', '#15803d', topRows)}${bottomFiveS.length ? sCol('Bottom 5', '#b91c1c', bottomRows) : '<p class="muted-note">Not enough stores for a bottom list.</p>'}</div><div style="font-size:12px;color:var(--text-secondary);margin-top:12px;">Sales are this month. Chip is the change against ${prevLbl}.</div>`
+      : '';
+    const sBox = $('storeModernBox') || (() => { const b = $('topStoresChart').closest('.chart-container'); b.id = 'storeModernBox'; return b; })();
+    const storeCardEl = sBox.closest('.chart-card');
+    const sDl = storeCardEl.querySelector('.chart-download-btn');
+    if (sDl) sDl.style.display = 'none';
+    storeCardEl.style.gridColumn = '1 / -1';
+    // Top Stores card is removed from the page; the data stays in the page code
+    storeCardEl.style.display = 'none';
+    sBox.style.height = 'auto';
+    sBox.innerHTML = sRows || '<p class="muted-note">No store sales in the current filters.</p>';
+
+    // Monthly trend as a list (same style as Top Stores): this year's months with the change against the month before,
+    // then the lowest month and the next month's forecast
+    const trendBox = $('trendListBox') || (() => { const b = $('monthlyTrendChart').closest('.chart-container'); b.id = 'trendListBox'; return b; })();
+    // Monthly Trend + Forecast card is removed from the page; the data stays in the page code
+    trendBox.closest('.chart-card').style.display = 'none';
+    const trendDl = trendBox.closest('.chart-card').querySelector('.chart-download-btn');
+    if (trendDl) trendDl.style.display = 'none';
+    trendBox.style.height = 'auto';
+    const months26 = mAgg.filter(m => m.year === CY).sort((a, b) => a.month - b.month);
+    if (!months26.length) {
+      trendBox.innerHTML = '<p class="muted-note">No monthly sales in the current filters.</p>';
+    } else {
+      const bestM = months26.reduce((b, m) => (m.net > b.net ? m : b), months26[0]);
+      const lowM = months26.reduce((b, m) => (m.net < b.net ? m : b), months26[0]);
+      const monthRow = (m, idx) => {
+        const label = `${MONTHS[m.month - 1]}${m.month === mctx.curM ? ' (to date)' : ''}`;
+        const tag = m === bestM && months26.length > 1
+          ? '<span style="font-size:11px;font-weight:500;color:var(--success);background:var(--success-light);padding:2px 8px;border-radius:999px;">Best</span>'
+          : (idx === 0 ? '' : chipOf(m.net, months26[idx - 1].net));
+        return `<div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:9px 12px;background:var(--surface-2);border-radius:10px;border-left:3px solid ${SHARE_COLORS[idx % SHARE_COLORS.length]};font-size:13px;">
+          <span style="color:var(--text-primary);font-weight:500;">${label}</span>
+          <span style="color:var(--text-primary);font-weight:500;white-space:nowrap;">${fmtCur(m.net)}</span>${tag}</div>`;
+      };
+      const lowRow = `<div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:9px 12px;background:var(--surface-2);border-radius:10px;border-left:3px solid #94a3b8;font-size:13px;">
+          <span style="color:var(--text-primary);font-weight:500;">${MONTHS[lowM.month - 1]}</span>
+          <span style="color:var(--text-primary);font-weight:500;white-space:nowrap;">${fmtCur(lowM.net)}</span>
+          <span style="font-size:11px;font-weight:500;color:var(--danger);background:var(--danger-light);padding:2px 8px;border-radius:999px;">Lowest</span></div>`;
+      const nextLbl = MONTHS[mctx.curM % 12];
+      const fcRow = forecastVal !== null ? `<div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:9px 12px;background:var(--primary-light);border-radius:10px;border-left:3px dashed var(--primary);font-size:13px;">
+          <span style="color:var(--primary);font-weight:500;">${nextLbl} (forecast)</span>
+          <span style="color:var(--primary);font-weight:500;white-space:nowrap;">${fmtCur(forecastVal)}</span>
+          <span style="font-size:11px;font-weight:500;color:var(--primary);background:var(--surface-2);padding:2px 8px;border-radius:999px;">trend</span></div>` : '';
+      trendBox.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;">
+        <div><div style="font-size:11px;font-weight:500;letter-spacing:0.5px;text-transform:uppercase;color:var(--primary);margin-bottom:8px;">${CY} by month</div><div style="display:grid;gap:8px;">${months26.map(monthRow).join('')}</div></div>
+        <div><div style="font-size:11px;font-weight:500;letter-spacing:0.5px;text-transform:uppercase;color:var(--danger);margin-bottom:8px;">Lowest and forecast</div><div style="display:grid;gap:8px;">${lowRow}${fcRow}</div></div>
+      </div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:12px;">Chip is the change against the month before. The current month is partial until it is complete.</div>`;
+    }
+
+    // Managers: this month against last month, with the change as a pill
+    const mCur = sumBy(curRows, 'area'), mPrev = sumBy(prevRowsNow, 'area');
+    const mList = [...new Set([...mCur.keys(), ...mPrev.keys()])]
+      .map(name => ({ name, cur: mCur.get(name) || 0, prev: mPrev.get(name) || 0 }))
+      .filter(m => m.cur > 0 || m.prev > 0).sort((a, b) => b.cur - a.cur);
+    // All managers by current-month sales, highest first; the top and bottom are marked
+    const mBox = $('mgrModernBox') || (() => { const b = $('areaChart').closest('.chart-container'); b.id = 'mgrModernBox'; return b; })();
+    const mDl = mBox.closest('.chart-card').querySelector('.chart-download-btn');
+    if (mDl) mDl.style.display = 'none';
+    mBox.style.height = 'auto';
+    // The Manager Performance card is hidden; the manager pie in the top row stays
+    mBox.closest('.chart-card').style.display = 'none';
+    // Same row style as the store list: top managers first, then the bottom managers
+    const mgrRow = (m, i, color) => `<div style="display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:10px 14px;background:var(--surface-2);border-radius:10px;border-left:3px solid ${color};">
+        <span style="font-size:13px;color:var(--text-primary);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i}${escapeHtml(m.name)}</span>
+        <span style="font-size:14px;font-weight:500;color:var(--text-primary);white-space:nowrap;">${fmtCur(m.cur)}</span></div>`;
+    const mgrLabel = t => `<div style="font-size:11px;font-weight:500;letter-spacing:0.4px;text-transform:uppercase;color:var(--text-secondary);margin:4px 0 6px;">${t}</div>`;
+    const mTop = mList.slice(0, 4), mBottom = mList.slice(4);
+    const mgrHtml = mTop.map((m, i) => mgrRow(m, `#${i + 1} `, SHARE_COLORS[i % SHARE_COLORS.length])).join('')
+      + (mBottom.length ? mgrLabel('Bottom managers') + mBottom.map(m => mgrRow(m, '', '#94a3b8')).join('') : '');
+    mBox.innerHTML = mList.length ? `<div style="display:grid;gap:8px;">${mgrLabel('Top managers')}${mgrHtml}</div>` : '<p class="muted-note">No sales in the current filters.</p>';
   }
 
   // ===== YOY COMPARISON =====
@@ -4110,7 +4574,8 @@ function getMaxDayForMonth(targetYear, targetMonth) {
   let pinnedOnly = false;
 
   function renderTable(data) {
-    const tm = window.__targetMaps || getTargetMap();
+    // Targets come from the database once it has been checked (same values as the browser's target map)
+    const tm = window.__dbTargetMaps || window.__targetMaps || getTargetMap();
     const sY = window.__salesYear;
 
     // Wastage lookup per store+month. When both years have wastage for the same
@@ -4178,15 +4643,30 @@ function getMaxDayForMonth(targetYear, targetMonth) {
       const s = prevDaySets.get(k);
       v.activeDays = s ? s.size : 0;
     });
+    // Previous-month figures come from the database once it has been checked for this filter
+    if (window.__dbPrevMap) {
+      prevMap.clear();
+      window.__dbPrevMap.forEach((v, k) => prevMap.set(k, { net: v.net, orders: v.orders, activeDays: v.days }));
+    }
     const NO_PREV = { net: 0, orders: 0, activeDays: 0 };
     const prevOf = g => prevMap.get(`${g.storeCode}||${g.area}`) || NO_PREV;
     const wasteOf = g => wMap.get(`${g.storeCode}||${g.month}`);
 
-    let rows = [...gMap.values()].map(g => ({
-      ...g,
-      days2025: g.days2025Set.size,
-      days2026: g.days2026Set.size
-    }));
+    // Sales, customers and active days come from the database when its store-month totals are loaded for this filter
+    const dbSM = window.__dbStoreMonth || null;
+    const dbFor = (g, y) => dbSM ? (dbSM.get(`${g.storeCode}||${g.area}||${y}||${g.month}`) || { sales: 0, customers: 0, days: 0 }) : null;
+    let rows = [...gMap.values()].map(g => {
+      const a = dbFor(g, LY), b = dbFor(g, CY);
+      return {
+        ...g,
+        net2025: a ? a.sales : g.net2025,
+        orders2025: a ? a.customers : g.orders2025,
+        net2026: b ? b.sales : g.net2026,
+        orders2026: b ? b.customers : g.orders2026,
+        days2025: a ? a.days : g.days2025Set.size,
+        days2026: b ? b.days : g.days2026Set.size
+      };
+    });
     const rankMap = new Map();
     [...rows].sort((a, b) => b.net2026 - a.net2026).slice(0, 3).forEach((r, i) => rankMap.set(r.storeCode, i + 1));
 
@@ -4367,7 +4847,9 @@ function getMaxDayForMonth(targetYear, targetMonth) {
   const COL_GROUPS = ['mgr', 'seg', 'fmt', 'mo', 'tgt', 'ly', 'prev', 'cy', 'ratios', 'waste'];
   const LEFT_COLS = ['mgr', 'seg', 'fmt', 'mo', 'tgt'];
   const VIEW_TABLES = ['dataTable', 'faTableSegment', 'faTableFormat', 'faTableAm'];
-  const tableView = Object.assign({ hidden: [], compact: false }, storeGet('tableView', {}));
+  // Manager, Segment, Format and Month start hidden so the table fits the screen; the Columns menu brings them back.
+  // (Stored under a new key so every user gets this default once.)
+  const tableView = Object.assign({ hidden: ['mgr', 'seg', 'fmt', 'mo'], compact: false }, storeGet('tableView2', {}));
   function leftColSpan() { return 6 - LEFT_COLS.filter(c => tableView.hidden.includes(c)).length; }
   function applyTableView() {
     VIEW_TABLES.forEach(id => { const tbl = $(id); if (tbl) COL_GROUPS.forEach(g => tbl.classList.toggle(`hide-${g}`, tableView.hidden.includes(g))); });
@@ -4383,7 +4865,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     const cb = e.target;
     if (cb.dataset.col) tableView.hidden = COL_GROUPS.filter(g => g === cb.dataset.col ? !cb.checked : tableView.hidden.includes(g));
     else if (cb.id === 'vmCompact') tableView.compact = cb.checked;
-    storeSet('tableView', tableView);
+    storeSet('tableView2', tableView);
     applyTableView();
   });
   document.querySelectorAll('.view-menu-btn').forEach(btn => btn.addEventListener('click', e => {
@@ -5828,6 +6310,74 @@ createMonthCompare({
     location.reload();
   });
 
+  // ===== CALCULATOR (simple: + − × ÷, %, decimal point, backspace, clear) =====
+  (function () {
+    var modal = document.getElementById('calcModal'), show = document.getElementById('calcDisplay');
+    var cur = '0', prev = null, op = null, fresh = true;
+    function fmt(r) { return isFinite(r) ? String(Math.round(r * 1e10) / 1e10) : 'Error'; }
+    function calc(a, b, o) {
+      if (o === '+') return a + b;
+      if (o === '-') return a - b;
+      if (o === '*') return a * b;
+      return b === 0 ? NaN : a / b;
+    }
+    function draw() { show.textContent = cur; }
+    function press(k) {
+      if (cur === 'Error' && k !== 'C') { cur = '0'; fresh = true; }
+      if (/^[0-9]$/.test(k)) {
+        if (fresh || cur === '0') { cur = k; fresh = false; }
+        else if (cur.length < 14) cur += k;
+      } else if (k === '.') {
+        if (fresh) { cur = '0.'; fresh = false; }
+        else if (!cur.includes('.')) cur += '.';
+      } else if (k === 'C') { cur = '0'; prev = null; op = null; fresh = true; }
+      else if (k === 'back') { if (!fresh) cur = cur.length > 1 ? cur.slice(0, -1) : '0'; }
+      else if (k === '%') { cur = fmt(Number(cur) / 100); fresh = true; }
+      else if (k === '+' || k === '-' || k === '*' || k === '/') {
+        if (op && !fresh) { prev = calc(prev, Number(cur), op); cur = fmt(prev); }
+        else prev = Number(cur);
+        op = k; fresh = true;
+      } else if (k === '=') {
+        if (op) { cur = fmt(calc(prev, Number(cur), op)); prev = null; op = null; fresh = true; }
+      }
+      draw();
+    }
+    document.getElementById('calcBtn').addEventListener('click', function () { modal.classList.add('open'); });
+    document.getElementById('calcClose').addEventListener('click', function () { modal.classList.remove('open'); });
+    modal.addEventListener('click', function (e) { if (e.target === modal) modal.classList.remove('open'); });
+    document.getElementById('calcPad').addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-k]');
+      if (b) press(b.dataset.k);
+    });
+  })();
+
+  // ===== CHANGE PASSWORD (updates the signed-in user's password in Supabase) =====
+  (function () {
+    var modal = document.getElementById('pwModal');
+    var pw1 = document.getElementById('pwNew'), pw2 = document.getElementById('pwNew2');
+    var err = document.getElementById('pwErr'), save = document.getElementById('pwSave');
+    function close() { modal.classList.remove('open'); pw1.value = ''; pw2.value = ''; err.textContent = ''; }
+    document.getElementById('pwBtn').addEventListener('click', function () {
+      if (!window.__loggedIn) { showToast('Sign in first', 'info'); return; }
+      pw1.value = ''; pw2.value = ''; err.textContent = '';
+      modal.classList.add('open');
+      setTimeout(function () { pw1.focus(); }, 30);
+    });
+    document.getElementById('pwCancel').addEventListener('click', close);
+    modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+    save.addEventListener('click', async function () {
+      var a = pw1.value, b = pw2.value;
+      if (a.length < 8) { err.textContent = 'Use at least 8 characters.'; return; }
+      if (a !== b) { err.textContent = 'The two passwords do not match.'; return; }
+      save.disabled = true; err.textContent = 'Saving…';
+      var r = await sb.auth.updateUser({ password: a });
+      save.disabled = false;
+      if (r.error) { err.textContent = 'Could not change the password: ' + r.error.message; return; }
+      close();
+      showToast('Password changed. Use the new password next time you sign in.', 'success');
+    });
+  })();
+
   // ===== SYNC: copy the loaded sales and wastage files into the database =====
   // Replaces only the dates present in each file. Other dates are kept.
   async function syncToDatabase() {
@@ -5835,10 +6385,12 @@ createMonthCompare({
     // Read the two files straight from storage, so the sync always uses the uploaded files
     try {
       setBusy(true, 'Reading files from storage…');
-      var sBuf = await downloadBuffer('Sales till 10 th Nov.xlsx');
-      window.__processWorkbook(sBuf, 'Sales till 10 th Nov.xlsx', { savedAt: Date.now() });
-      var wBuf = await downloadBuffer('Wastage YTD.xlsx');
-      window.__processWastageWorkbook(wBuf, 'Wastage YTD.xlsx', { savedAt: Date.now() }, true);
+      var found = await findSalesAndWastageFiles();
+      var sBuf = await downloadBuffer(found.sales);
+      window.__processWorkbook(sBuf, found.sales, { savedAt: Date.now() });
+      var wBuf = await downloadBuffer(found.wastage);
+      window.__processWastageWorkbook(wBuf, found.wastage, { savedAt: Date.now() }, true);
+      window.__syncFileNames = found;
     } catch (e) {
       setBusy(false);
       showToast('Could not read the files from storage: ' + (e.message || e), 'error');
@@ -5880,9 +6432,9 @@ createMonthCompare({
 
     try {
       setBusy(true, 'Syncing to database…');
-      var sBatch = await sb.from('upload_batches').insert({ kind: 'sales', filename: 'Sales till 10 th Nov.xlsx', row_count: salesOk.length, uploaded_by: u.id }).select('id').single();
+      var sBatch = await sb.from('upload_batches').insert({ kind: 'sales', filename: window.__syncFileNames.sales, row_count: salesOk.length, uploaded_by: u.id }).select('id').single();
       if (sBatch.error) throw sBatch.error;
-      var wBatch = await sb.from('upload_batches').insert({ kind: 'wastage', filename: 'Wastage YTD.xlsx', row_count: wasteOk.length, uploaded_by: u.id }).select('id').single();
+      var wBatch = await sb.from('upload_batches').insert({ kind: 'wastage', filename: window.__syncFileNames.wastage, row_count: wasteOk.length, uploaded_by: u.id }).select('id').single();
       if (wBatch.error) throw wBatch.error;
 
       await deleteDates('sales_rows', 'sale_date', salesDates);
@@ -5918,6 +6470,18 @@ createMonthCompare({
     }
   }
   // ===== READ FROM THE DATABASE (row-level rules decide which rows arrive) =====
+  // Finds the sales and wastage files in the bucket by name: a name with "wast" is wastage,
+  // a name with "sale" (and no "wast") is sales. Any extra words are allowed (e.g. "sale.xlsx", "Wastage 12 Nov.xlsx").
+  async function findSalesAndWastageFiles() {
+    var r = await sb.storage.from('sales-data').list('', { limit: 100 });
+    if (r.error) throw r.error;
+    var names = (r.data || []).map(function (f) { return f.name; }).filter(function (n) { return /\.xlsx?$/i.test(n); });
+    var wast = names.filter(function (n) { return /wast/i.test(n); });
+    var sales = names.filter(function (n) { return /sale/i.test(n) && !/wast/i.test(n); });
+    if (!sales.length) throw new Error('no sales file in the bucket (its name should contain "sale")');
+    if (!wast.length) throw new Error('no wastage file in the bucket (its name should contain "wast")');
+    return { sales: sales[0], wastage: wast[0] };
+  }
   async function downloadBuffer(name) {
     var r = await sb.storage.from('sales-data').download(name);
     if (r.error || !r.data) throw new Error('file not found in storage: ' + name);
@@ -6140,9 +6704,9 @@ createMonthCompare({
       var since = new Date(d.getFullYear(), d.getMonth() - 1, 1);
       var sinceStr = since.getFullYear() + '-' + String(since.getMonth() + 1).padStart(2, '0') + '-01';
 
+      // Sales first. Wastage is the largest download, so it loads after sales (see __loadWastageOnDemand)
       var recentSales = await fetchFast('sales_rows', SALES_SEL, 'sale_date', sinceStr);
-      var recentWaste = await fetchFast('wastage_rows', WASTE_SEL, 'sale_date', sinceStr);
-      applyRows(recentSales, recentWaste);
+      applyRows(recentSales, []);
       // Start on the latest month only, so clicks stay fast; select "All" in Month for more
       var latestMonthValue = String(d.getMonth() + 1);
       if (FilterState.month && FilterState.month.options.some(function (o) { return o.value === latestMonthValue; })) {
@@ -6154,12 +6718,15 @@ createMonthCompare({
       setBusy(false);
       showToast('Recent months shown. Loading full history in the background…', 'info');
 
-      var allSales = await fetchFast('sales_rows', SALES_SEL, null, null);
-      var allWaste = await fetchFast('wastage_rows', WASTE_SEL, null, null);
+      // Full sales history in parallel id slices (same method as wastage; avoids slow large offsets)
+      var allSales = await fetchKeyset('sales_rows', SALES_SEL);
       var snap = snapshotFilters();
-      applyRows(allSales, allWaste);
+      applyRows(allSales, []);
       restoreFilters(snap);
-      showToast('Full history loaded: ' + allSales.length + ' sales rows', 'success');
+      checkOverviewAgainstDatabase();
+      checkTargetsAgainstDatabase();
+      showToast('Full sales history loaded: ' + allSales.length + ' rows. Wastage loading in the background…', 'success');
+      window.__loadWastageOnDemand();
     } catch (err) {
       console.error('Fast load failed', err);
       showToast('Database load failed, loading from the files instead', 'info');
@@ -6169,6 +6736,257 @@ createMonthCompare({
     }
   }
   window.__loadRecentThenFull = loadRecentThenFull;
+
+  // Wastage is loaded once, in the background after sales, or when the Wastage tab is opened first.
+  // Both callers share the same load, so the data is never downloaded twice.
+  var wastageLoad = null;
+  // Reads a whole table one page at a time, each page starting after the last id it returned.
+  // Small, fast requests: avoids the database timeout that large offsets caused. Retries a page up to 3 times.
+  // The id range is split into slices that download at the same time. Each slice is read page by page.
+  async function fetchKeyset(table, select) {
+    var PS = 5000, SLICES = 12, loaded = 0;
+    var top = await sb.from(table).select('id').order('id', { ascending: false }).limit(1).maybeSingle();
+    if (top.error) throw top.error;
+    if (!top.data) return [];
+    var maxId = Number(top.data.id);
+    var step = Math.ceil(maxId / SLICES);
+    async function readSlice(fromId, toId) {
+      var rows = [], lastId = fromId;
+      while (true) {
+        var data = null, lastErr = null;
+        for (var attempt = 1; attempt <= 3 && !data; attempt++) {
+          var r = await sb.from(table).select(select).gt('id', lastId).lte('id', toId).order('id', { ascending: true }).limit(PS);
+          if (r.error) { lastErr = r.error; await new Promise(function (res) { setTimeout(res, 1000 * attempt); }); }
+          else data = r.data || [];
+        }
+        if (!data) throw lastErr || new Error('page failed');
+        rows = rows.concat(data);
+        loaded += data.length;
+        setBusy(true, 'Loading rows… ' + loaded);
+        if (data.length < PS) break;
+        lastId = data[data.length - 1].id;
+      }
+      return rows;
+    }
+    var jobs = [];
+    for (var s = 0; s < SLICES; s++) jobs.push(readSlice(s * step, (s + 1) * step));
+    var parts = await Promise.all(jobs);
+    var out = [];
+    parts.forEach(function (p) { out = out.concat(p); });
+    out.sort(function (a, b) { return a.id - b.id; });
+    return out;
+  }
+  window.__loadWastageOnDemand = function () {
+    if (wastageLoad) return wastageLoad;
+    window.__wastageLoading = true;
+    wastageLoad = (async function () {
+      try {
+        setBusy(true, 'Loading wastage…');
+        var w = await fetchKeyset('wastage_rows', WASTE_SEL);
+        applyRows([], w);
+        showToast('Wastage loaded: ' + w.length + ' rows', 'success');
+      } catch (e) {
+        console.error('Wastage load failed', e);
+        wastageLoad = null; // allow a retry
+        showToast('Wastage load failed. Open the Wastage tab to try again.', 'error');
+      } finally {
+        window.__wastageLoading = false;
+        setBusy(false);
+      }
+    })();
+    return wastageLoad;
+  };
+
+  // Check only: asks the database for the same Overview sales figure and compares it (nothing on screen changes)
+  async function checkOverviewAgainstDatabase() {
+    try {
+      var ctx = window.__getMonthContext();
+      var df = Number(document.getElementById('dayFrom').value) || 1;
+      var dt = Number(document.getElementById('dayTo').value) || 31;
+      var r = await sb.rpc('get_period_totals', { p_year: ctx.curY, p_month: ctx.curM, p_day_from: df, p_day_to: dt });
+      if (r.error) throw r.error;
+      var dbSales = Number(r.data[0].sales);
+      var shown = Number(String(document.getElementById('kpiSalesMain').textContent).replace(/[^0-9.\-]/g, ''));
+      var same = Math.abs(dbSales - shown) < 1;
+      var fmt = function (v) { return Math.round(v).toLocaleString('en-US'); };
+      showToast(same
+        ? 'Check: Overview matches the database (' + fmt(dbSales) + ')'
+        : 'Check: difference. Dashboard ' + fmt(shown) + ' vs database ' + fmt(dbSales),
+        same ? 'success' : 'error');
+    } catch (e) {
+      console.error('Overview check failed', e);
+    }
+  }
+  window.__checkOverview = checkOverviewAgainstDatabase;
+
+  // Overview headline (Sales and Customers) from the database for the current filters.
+  // The browser's own figures are written first on every filter change; this then replaces the two
+  // headline numbers with the database totals, so they are right even while full history is still loading.
+  // A sequence number makes sure only the answer to the latest filter change is shown.
+  // Average-daily (ADS), LFL-only and search modes stay on the browser's figures.
+  var overviewSeq = 0;
+  async function checkOverviewFiltersAgainstDatabase() {
+    var seq = ++overviewSeq;
+    try {
+      var p = window.__overviewFilterParams ? window.__overviewFilterParams() : null;
+      if (!p) { console.log('Overview database figures skipped (search, LFL-only or ADS is on)'); return; }
+      var r = await sb.rpc('overview_totals', p);
+      if (r.error) throw r.error;
+      if (seq !== overviewSeq) return; // a newer filter change has happened since this request
+      var row = r.data[0];
+      var salesEl = document.getElementById('kpiSalesMain');
+      var ccEl = document.getElementById('kpiCcMain');
+      var shownSales = salesEl.textContent.trim() === '—' ? 0 : Number(salesEl.textContent.replace(/[^0-9.\-]/g, ''));
+      var shownCc = ccEl.textContent.trim() === '—' ? 0 : Number(ccEl.textContent.replace(/[^0-9.\-]/g, ''));
+      var dbSales = Number(row.sales), dbCc = Number(row.customers), dbRows = Number(row.rows);
+      var fmt = function (v) { return Math.round(v).toLocaleString('en-US'); };
+      var differs = Math.abs(dbSales - shownSales) >= 1 || Math.abs(dbCc - shownCc) >= 1;
+      if (differs) console.log('Overview: browser figures differed from database', { browserSales: shownSales, databaseSales: dbSales, browserCustomers: shownCc, databaseCustomers: dbCc });
+      else console.log('Overview check: browser figures match database', { sales: dbSales, customers: dbCc });
+      salesEl.textContent = dbRows > 0 ? fmt(dbSales) : '—';
+      ccEl.textContent = dbRows > 0 ? fmt(dbCc) : '—';
+    } catch (e) {
+      console.error('Overview database figures failed', e);
+    }
+  }
+  window.__checkOverviewFilters = checkOverviewFiltersAgainstDatabase;
+  document.addEventListener('dashboard:filtered', function () { checkOverviewFiltersAgainstDatabase(); });
+
+  // Detailed table: store-by-month totals from the database (sales, customers, days) are used by the table.
+  // Matches and differences are logged. The table is redrawn with the database figures when they arrive.
+  var detailedSeq = 0;
+  async function checkDetailedAgainstDatabase() {
+    var seq = ++detailedSeq;
+    try {
+      var p = window.__overviewFilterParams ? window.__overviewFilterParams() : null;
+      if (!p || !window.__filteredData) { console.log('Detailed check skipped (search, LFL-only or ADS is on)'); return; }
+      var sel = window.__yearsSelected ? window.__yearsSelected() : [];
+      var yrs = [window.__CY];
+      if (window.__LY != null && sel.indexOf(window.__LY) !== -1) yrs.push(window.__LY);
+      p.p_years = yrs;
+      var r = await sb.rpc('store_month_totals', p);
+      if (r.error) throw r.error;
+      if (seq !== detailedSeq) return; // a newer filter change has happened since this request
+      var dbMap = new Map();
+      r.data.forEach(function (x) {
+        dbMap.set(x.store_code + '||' + x.area_manager + '||' + x.year + '||' + x.month, { sales: Number(x.sales), customers: Number(x.customers), days: Number(x.days) });
+      });
+      window.__dbStoreMonth = dbMap;
+      if (window.__activeTab === 'table' && window.renderActiveTab) window.renderActiveTab();
+      // Browser side: the same grouping the Detailed table uses (store, area, year, month)
+      var js = new Map();
+      window.__filteredData.forEach(function (x) {
+        if (yrs.indexOf(x.year) === -1) return;
+        var k = x.storeCode + '||' + x.area + '||' + x.year + '||' + x.month;
+        if (!js.has(k)) js.set(k, { sales: 0, customers: 0, days: new Set() });
+        var g = js.get(k);
+        g.sales += x.net; g.customers += (x.orders || 0);
+        if (x.net > 0 && x.day != null) g.days.add(x.day);
+      });
+      var db = new Map();
+      r.data.forEach(function (x) { db.set(x.store_code + '||' + x.area_manager + '||' + x.year + '||' + x.month, x); });
+      var keys = new Set([].concat(Array.from(js.keys()), Array.from(db.keys())));
+      var diffs = [];
+      keys.forEach(function (k) {
+        var a = js.get(k), b = db.get(k);
+        var aS = a ? a.sales : 0, aC = a ? a.customers : 0, aD = a ? a.days.size : 0;
+        var bS = b ? Number(b.sales) : 0, bC = b ? Number(b.customers) : 0, bD = b ? Number(b.days) : 0;
+        if (Math.abs(aS - bS) >= 1 || Math.abs(aC - bC) >= 1 || aD !== bD) {
+          diffs.push({ key: k, browser: { sales: aS, customers: aC, days: aD }, database: { sales: bS, customers: bC, days: bD } });
+        }
+      });
+      window.__detailedDiffs = diffs;
+      if (diffs.length === 0) console.log('Detailed check: all ' + keys.size + ' store-months match the database');
+      else console.log('Detailed check: ' + diffs.length + ' of ' + keys.size + ' store-months differ. First 3: ' + JSON.stringify(diffs.slice(0, 3)));
+    } catch (e) {
+      console.error('Detailed check failed', e);
+    }
+  }
+  window.__checkDetailed = checkDetailedAgainstDatabase;
+  document.addEventListener('dashboard:filtered', function () { checkDetailedAgainstDatabase(); });
+
+  // Target check: the database's monthly targets compared with the browser's target map. Nothing on screen changes.
+  // Targets do not depend on filters, so this runs once after the full history has loaded.
+  async function checkTargetsAgainstDatabase() {
+    try {
+      var tm = window.__targetMaps;
+      if (!tm) { console.log('Target check skipped: browser targets not built yet'); return; }
+      var r = await sb.rpc('store_month_targets');
+      if (r.error) throw r.error;
+      var dbExact = new Map(), dbCodeYM = new Map();
+      r.data.forEach(function (x) {
+        var t = Number(x.target);
+        dbExact.set(x.store_code + '||' + x.area_manager + '||' + x.year + '||' + x.month, t);
+        var k2 = x.store_code + '||' + x.year + '||' + x.month;
+        dbCodeYM.set(k2, (dbCodeYM.get(k2) || 0) + t);
+      });
+      // The Detailed table reads its targets from these maps (same shape as the browser's target map)
+      window.__dbTargetMaps = { exact: dbExact, byCodeYearMonth: dbCodeYM };
+      var diffs = [];
+      new Set([].concat(Array.from(tm.exact.keys()), Array.from(dbExact.keys()))).forEach(function (k) {
+        var a = tm.exact.get(k) || 0, b = dbExact.get(k) || 0;
+        if (Math.abs(a - b) >= 1) diffs.push({ level: 'store-area-month', key: k, browser: a, database: b });
+      });
+      new Set([].concat(Array.from(tm.byCodeYearMonth.keys()), Array.from(dbCodeYM.keys()))).forEach(function (k) {
+        var a = tm.byCodeYearMonth.get(k) || 0, b = dbCodeYM.get(k) || 0;
+        if (Math.abs(a - b) >= 1) diffs.push({ level: 'store-month', key: k, browser: a, database: b });
+      });
+      window.__targetDiffs = diffs;
+      if (diffs.length === 0) console.log('Target check: all targets match the database (' + tm.exact.size + ' store-area-months)');
+      else console.log('Target check: ' + diffs.length + ' target values differ. First 5: ' + JSON.stringify(diffs.slice(0, 5)));
+    } catch (e) {
+      console.error('Target check failed', e);
+    }
+  }
+  window.__checkTargets = checkTargetsAgainstDatabase;
+
+  // Previous-month check: the database's previous-month figures per store and area, compared with the rows the
+  // Detailed table uses for its "Prev Month" columns. Nothing on screen changes.
+  var prevSeq = 0;
+  async function checkPrevAgainstDatabase() {
+    var seq = ++prevSeq;
+    try {
+      var p = window.__overviewFilterParams ? window.__overviewFilterParams() : null;
+      if (!p || !window.__prevRows) { console.log('Previous-month check skipped (search, LFL-only or ADS is on)'); return; }
+      var ctx = window.__getMonthContext();
+      p.p_years = [ctx.prevY];
+      p.p_months = [ctx.prevM];
+      var r = await sb.rpc('store_month_totals', p);
+      if (r.error) throw r.error;
+      if (seq !== prevSeq) return;
+      var db = new Map();
+      r.data.forEach(function (x) {
+        db.set(x.store_code + '||' + x.area_manager, { net: Number(x.sales), orders: Number(x.customers), days: Number(x.days) });
+      });
+      var js = new Map();
+      window.__prevRows.forEach(function (x) {
+        var k = x.storeCode + '||' + x.area;
+        if (!js.has(k)) js.set(k, { net: 0, orders: 0, days: new Set() });
+        var g = js.get(k);
+        g.net += x.net; g.orders += (x.orders || 0);
+        if (x.net > 0 && x.day != null) g.days.add(x.day);
+      });
+      var diffs = [];
+      new Set([].concat(Array.from(js.keys()), Array.from(db.keys()))).forEach(function (k) {
+        var a = js.get(k), b = db.get(k);
+        var aN = a ? a.net : 0, aO = a ? a.orders : 0, aD = a ? a.days.size : 0;
+        var bN = b ? b.net : 0, bO = b ? b.orders : 0, bD = b ? b.days : 0;
+        if (Math.abs(aN - bN) >= 1 || Math.abs(aO - bO) >= 1 || aD !== bD) {
+          diffs.push({ key: k, browser: { net: aN, orders: aO, days: aD }, database: { net: bN, orders: bO, days: bD } });
+        }
+      });
+      window.__prevDiffs = diffs;
+      // The Detailed table reads its previous-month figures from these (same shape as the browser's)
+      window.__dbPrevMap = db;
+      if (window.__activeTab === 'table' && window.renderActiveTab) window.renderActiveTab();
+      if (diffs.length === 0) console.log('Previous-month check: all ' + js.size + ' store-areas match the database');
+      else console.log('Previous-month check: ' + diffs.length + ' differ. First 3: ' + JSON.stringify(diffs.slice(0, 3)));
+    } catch (e) {
+      console.error('Previous-month check failed', e);
+    }
+  }
+  window.__checkPrev = checkPrevAgainstDatabase;
+  document.addEventListener('dashboard:filtered', function () { checkPrevAgainstDatabase(); });
 
   window.__loadFromDatabase = loadFromDatabase;
   document.getElementById('syncBtn').addEventListener('click', syncToDatabase);
