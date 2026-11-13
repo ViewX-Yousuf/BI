@@ -6240,6 +6240,8 @@ function createMonthCompare({ hostId, toggleBtnId, groupings, stacked = false })
         <select class="cmp-select" data-i="0" aria-label="First month"></select>
         <select class="cmp-select" data-i="1" aria-label="Second month"></select>
         <select class="cmp-select" data-i="2" aria-label="Third month"></select>
+        <button type="button" class="toggle-btn" data-role="lfl" title="Only stores that sold in the previous year"><i class="fas fa-filter"></i> LFL Only</button>
+        <button type="button" class="toggle-btn" data-role="new" title="Only stores with no sales in the previous year"><i class="fas fa-star"></i> New Stores</button>
         <button type="button" class="toggle-btn" data-role="ads" title="Show average per store-day"><i class="fas fa-calculator"></i> ADS</button>
         <button type="button" class="export-btn excel" data-role="excel"><i class="fas fa-file-excel"></i> Excel</button>
         <button type="button" class="cmp-close" data-role="close" aria-label="Close comparison"><i class="fas fa-xmark"></i></button>
@@ -6281,11 +6283,16 @@ function createMonthCompare({ hostId, toggleBtnId, groupings, stacked = false })
     const headLabel = stacked ? 'Group' : groupings[groupIdx].label;
     const COLS = (hasExtra ? 2 : 1) + 9 + 3;
     const groupRows = grouping => {
+      // Previous year of the latest picked month: stores that sold then are the LFL base
+      const lyYear = picked.length ? Number(picked[picked.length - 1].slice(0, 4)) - 1 : NaN;
+      const lyStores = new Set((window.__rawData || []).filter(r => r.year === lyYear && r.net > 0 && pass(r)).map(r => r.storeCode));
       const groups = new Map();
       (window.__rawData || []).forEach(r => {
         if (!r.year || !r.month) return;
         const key = periodKey(r);
         if (!picked.includes(key) || !pass(r)) return;
+        if (cmpScope === 'lfl' && !lyStores.has(r.storeCode)) return;
+        if (cmpScope === 'new' && lyStores.has(r.storeCode)) return;
         const id = grouping.idOf(r);
         if (!groups.has(id)) groups.set(id, { name: grouping.nameOf(r), extra: grouping.extraOf ? grouping.extraOf(r) : null, net: [0, 0, 0], cc: [0, 0, 0], days: [new Set(), new Set(), new Set()] });
         const g = groups.get(id);
@@ -6328,6 +6335,15 @@ function createMonthCompare({ hostId, toggleBtnId, groupings, stacked = false })
     this.classList.toggle('active', cmpAds);
     render();
   });
+  // Store scope: LFL Only and New Stores work like the main page (LFL = sold in the previous year)
+  let cmpScope = 'all';
+  panel.querySelectorAll('[data-role="lfl"], [data-role="new"]').forEach(btn => btn.addEventListener('click', () => {
+    const want = btn.dataset.role === 'lfl' ? 'lfl' : 'new';
+    cmpScope = cmpScope === want ? 'all' : want;
+    panel.querySelector('[data-role="lfl"]').classList.toggle('active', cmpScope === 'lfl');
+    panel.querySelector('[data-role="new"]').classList.toggle('active', cmpScope === 'new');
+    render();
+  }));
   // Opens in its own popup window over the page
   function setCmpOpen(open) {
     overlay.style.display = open ? 'flex' : 'none';
