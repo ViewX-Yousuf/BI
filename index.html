@@ -194,6 +194,7 @@
     .filter-chip { display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border-strong); font-size: .82rem; font-weight: 500; color: var(--text-main); cursor: pointer; user-select: none; white-space: nowrap; height: 34px; transition: background .18s var(--ease), border-color .18s, color .18s, box-shadow .18s; }
     .filter-chip:hover { background: var(--surface-hover); border-color: var(--text-light); }
     .filter-chip.open { border-color: var(--primary); box-shadow: 0 0 0 3px var(--ring); }
+    .filter-chip.locked { opacity: .55; cursor: not-allowed; pointer-events: none; }
     .filter-chip.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
     .filter-chip i.lead { color: var(--text-light); font-size: .78rem; }
     .filter-chip .chip-value { color: var(--text-muted); font-weight: 500; font-size: .78rem; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2058,7 +2059,24 @@ function applyTabFilters(s) {
 }
 function applyTabState(tab) {
   if (!(window.__rawData || []).length) return;
-  applyTabFilters(tabFilterStore[tab] || defaultTabFilters(tab));
+  const s = { ...(tabFilterStore[tab] || defaultTabFilters(tab)) };
+  // Detailed page: the Manager filter is frozen on all managers
+  if (tab === 'table' && FilterState.area) s.area = FilterState.area.options.map(o => o.value);
+  applyTabFilters(s);
+}
+// Freezes or unfreezes the Manager chip (used on the Detailed page)
+function setManagerLock(on) {
+  const chip = document.querySelector('[data-chip="area"]');
+  if (!chip) return;
+  chip.classList.toggle('locked', !!on);
+  chip.setAttribute('aria-disabled', on ? 'true' : 'false');
+  chip.tabIndex = on ? -1 : 0;
+  chip.title = on ? 'Manager is fixed on the Detailed page' : '';
+  if (on) {
+    chip.classList.remove('open');
+    const dd = document.querySelector('[data-dropdown="area"]');
+    if (dd) dd.classList.remove('open');
+  }
 }
 // Called when the data has fully loaded (and when wastage arrives): sets defaults for the page being shown
 window.__applyTabDefaultsNow = function () {
@@ -2072,6 +2090,7 @@ function switchTab(tabName) {
   // Save this page's filters before leaving it, then set up the page being opened
   if (activeFilterTab !== tabName && (window.__rawData || []).length) tabFilterStore[activeFilterTab] = captureTabFilters();
   activeFilterTab = tabName;
+  setManagerLock(tabName === 'table');
 
   window.__activeTab = tabName;
   if ((window.__rawData || []).length) applyTabState(tabName);
@@ -2461,6 +2480,7 @@ function closeFilterDropdowns() {
 document.querySelectorAll('.filter-chip').forEach(chip => {
   chip.addEventListener('click', e => {
     e.stopPropagation();
+    if (chip.classList.contains('locked')) return;
     const key = chip.dataset.chip;
     const dd = document.querySelector(`[data-dropdown="${key}"]`);
     const isOpen = dd.classList.contains('open');
