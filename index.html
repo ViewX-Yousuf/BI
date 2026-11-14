@@ -440,6 +440,8 @@
     tbody tr:hover td { background: var(--surface-hover); }
     .cell-positive, .pct-up { color: var(--success) !important; font-weight: 600; }
     .cell-negative, .pct-down { color: var(--danger) !important; font-weight: 600; }
+    /* Current-month numbers are shown plain, like the other months (colour and bold only on the % columns) */
+    td.cell-2026:not(.cell-ratios) { color: var(--text-main) !important; font-weight: 400 !important; }
 
     tr.missed-target td:first-child { box-shadow: inset 3px 0 0 var(--danger); }
     [dir="rtl"] tr.missed-target td:first-child { box-shadow: inset -3px 0 0 var(--danger); }
@@ -6943,6 +6945,30 @@ createMonthCompare({
   $('usersBtn').addEventListener('click', () => { overlay.style.display = 'flex'; loadUsers(); });
   $('usersClose').addEventListener('click', () => { overlay.style.display = 'none'; });
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.style.display = 'none'; });
+})();
+
+// ===== AUTO SIGN-OUT after 5 minutes without activity =====
+(function () {
+  const LIMIT_MS = 5 * 60 * 1000;
+  let timer = null;
+  function reset() {
+    if (!window.__loggedIn) return;
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      if (!window.__loggedIn) return;
+      try { await window.__sb.auth.signOut(); } catch (e) { /* signing out anyway */ }
+      try { sessionStorage.setItem('idleLogout', '1'); } catch (e) { /* storage blocked */ }
+      location.reload();
+    }, LIMIT_MS);
+  }
+  ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'wheel'].forEach(ev => document.addEventListener(ev, reset, { passive: true }));
+  // After an automatic sign-out, show the reason on the sign-in screen
+  let why = null;
+  try { why = sessionStorage.getItem('idleLogout'); sessionStorage.removeItem('idleLogout'); } catch (e) { /* storage blocked */ }
+  if (why) setTimeout(() => {
+    const err = document.getElementById('loginErr');
+    if (err) err.textContent = 'Signed out after 5 minutes of inactivity. Sign in again.';
+  }, 800);
 })();
 
 // ===== ASK YOUR DATA =====
