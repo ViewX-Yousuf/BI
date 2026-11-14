@@ -367,8 +367,8 @@
     .ask-fab { position: fixed; right: 20px; bottom: 20px; z-index: 950; width: 48px; height: 48px; border-radius: 50%; border: none; background: var(--primary); color: #fff; font-size: 18px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-lg); }
     .ask-fab:hover { filter: brightness(1.08); }
     @media (max-width: 640px) { .ask-fab { right: 14px; bottom: 14px; } }
-    .cmp-overlay { position: fixed; inset: 0; z-index: 1400; background: rgba(15, 23, 42, .45); align-items: center; justify-content: center; padding: 20px; }
-    .cmp-overlay .cmp-panel { width: min(1180px, 100%); max-height: calc(100vh - 40px); display: flex; flex-direction: column; margin: 0; background: var(--surface); box-shadow: var(--shadow-lg); }
+    .cmp-overlay { position: fixed; inset: 0; z-index: 1400; background: var(--surface); align-items: stretch; justify-content: stretch; padding: 0; }
+    .cmp-overlay .cmp-panel { width: 100%; height: 100vh; max-height: 100vh; display: flex; flex-direction: column; margin: 0; border: none; border-radius: 0; background: var(--surface); box-shadow: none; padding: 16px 20px; box-sizing: border-box; }
     .cmp-overlay .table-scroll { max-height: none; flex: 1; overflow: auto; }
     .cmp-close { border: none; background: transparent; color: var(--text-muted); cursor: pointer; padding: 6px 8px; font-size: 16px; }
     .cmp-close:hover { color: var(--text-main); }
@@ -573,6 +573,14 @@
     /* Change chip and its label on one line; the target line sits below the chip, like the other cards */
     #kpiPanel .kpi-row { align-items: center; flex-wrap: wrap; row-gap: 6px; }
     #kpiPanel #kpiTargetVs26Meta { flex-basis: 100%; }
+    /* Zone gauge inside the Target Achievement card (top right): red 0-80%, amber 80-100%, green 100-120% */
+    #kpiGauge { position: absolute; right: 14px; top: 14px; width: 150px; height: 103px; pointer-events: none; overflow: visible; }
+    #kpiGauge .g-zone { fill: none; stroke-width: 12; }
+    #kpiGauge .g-red { stroke: #dc2626; }
+    #kpiGauge .g-amber { stroke: #f59e0b; }
+    #kpiGauge .g-green { stroke: #16a34a; }
+    #kpiGauge .g-needle { stroke: var(--text-main); stroke-width: 3; stroke-linecap: round; }
+    #kpiGauge .g-hub { fill: var(--text-main); }
     /* Comparison lines stacked one below another, pinned to the bottom of each card */
     #kpiPanel > .kpi-card .kpi-meta { white-space: pre-line; margin-top: auto; }
     /* Same short side lines for the row of three charts */
@@ -803,6 +811,22 @@
   </div>
 </div>
 <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
+<div class="cmp-overlay" id="wCmpOverlay" style="display:none;">
+  <div class="table-container cmp-panel">
+    <div class="table-header-bar">
+      <h3><i class="fas fa-code-compare"></i> Wastage 3-Month Comparison</h3>
+      <div class="table-controls">
+        <select class="cmp-select" id="wCmpSel0" aria-label="First month"></select>
+        <select class="cmp-select" id="wCmpSel1" aria-label="Second month"></select>
+        <select class="cmp-select" id="wCmpSel2" aria-label="Third month"></select>
+        <button type="button" class="export-btn excel" id="wCmpExcel"><i class="fas fa-file-excel"></i> Excel</button>
+        <button type="button" class="export-btn pdf" id="wCmpPdf"><i class="fas fa-file-pdf"></i> PDF</button>
+        <button type="button" class="cmp-close" id="wCmpClose" aria-label="Close comparison"><i class="fas fa-xmark"></i></button>
+      </div>
+    </div>
+    <div class="table-scroll"><table><thead id="wCmpHead"></thead><tbody id="wCmpBody"></tbody></table></div>
+  </div>
+</div>
 <div class="um-overlay" id="usersOverlay" style="display:none;">
   <div class="um-box" role="dialog" aria-label="Manage users">
     <div class="um-head"><h3><i class="fas fa-users"></i> Manage users</h3><button type="button" class="cmp-close" id="usersClose" aria-label="Close"><i class="fas fa-xmark"></i></button></div>
@@ -1020,6 +1044,13 @@
     <div class="kpi-card kpi-hero">
       <div class="label"><i class="fas fa-bullseye"></i> Target Achievement</div>
       <div class="kpi-main" id="kpiTargetMain">—</div>
+      <svg id="kpiGauge" viewBox="0 0 140 96" aria-hidden="true">
+        <path class="g-zone g-red" d="M14,84 A56,56 0 0 1 98,35.5"></path>
+        <path class="g-zone g-amber" d="M98,35.5 A56,56 0 0 1 118.5,56"></path>
+        <path class="g-zone g-green" d="M118.5,56 A56,56 0 0 1 126,84"></path>
+        <line id="kpiNeedle" class="g-needle" x1="70" y1="84" x2="26" y2="84"></line>
+        <circle class="g-hub" cx="70" cy="84" r="5"></circle>
+      </svg>
       <div class="kpi-row"><span class="kpi-value" id="kpiTargetVs26">—</span><span class="kpi-meta" id="kpiTargetVs26Meta">—</span></div>
       <svg class="kpi-ring" viewBox="0 0 64 64" aria-hidden="true">
         <circle class="track" cx="32" cy="32" r="27"></circle>
@@ -1035,7 +1066,7 @@
       <canvas class="kpi-sparkline" id="sparkSales" width="80" height="30"></canvas>
     </div>
     <div class="kpi-card">
-      <div class="label"><i class="fas fa-users"></i> <span id="kpiCcLabel">Customers (CC)</span></div>
+      <div class="label"><i class="fas fa-users"></i> <span id="kpiCcLabel">ADT</span></div>
       <div class="kpi-main" id="kpiCcMain">—</div>
       <div class="kpi-row"><span class="kpi-value" id="kpiCcLfl">—</span><span class="kpi-meta">YoY</span></div>
       <div class="kpi-meta" id="kpiCcLflMeta">—</div>
@@ -1117,9 +1148,9 @@
               <th colspan="3" class="group-ratios">Growth %</th>
             </tr>
             <tr>
-              <th class="group-2025">Sales</th><th class="group-2025">CC</th><th class="group-2025">AT</th><th class="group-2025">Days</th>
-              <th class="group-2026">Sales</th><th class="group-2026">CC</th><th class="group-2026">AT</th><th class="group-2026">Days</th>
-              <th class="group-ratios">Sales</th><th class="group-ratios">CC</th><th class="group-ratios">AT</th>
+              <th class="group-2025">Sales</th><th class="group-2025">ADT</th><th class="group-2025">AT</th><th class="group-2025">Days</th>
+              <th class="group-2026">Sales</th><th class="group-2026">ADT</th><th class="group-2026">AT</th><th class="group-2026">Days</th>
+              <th class="group-ratios">Sales</th><th class="group-ratios">ADT</th><th class="group-ratios">AT</th>
             </tr>
           </thead>
           <tbody id="yoyTableBody"></tbody>
@@ -1213,8 +1244,14 @@
         <div class="chart-container"><canvas id="wastageMonthlyChart"></canvas></div>
       </div>
       <div class="chart-card full-width">
+        <button class="chart-download-btn" data-chart="wastageAmChart" title="Download PNG"><i class="fas fa-camera"></i></button>
+        <h3><i class="fas fa-user-tie"></i> Wastage % of Sales by Area Manager</h3>
+        <div class="chart-container" style="height:320px"><canvas id="wastageAmChart"></canvas></div>
+      </div>
+      <div class="chart-card full-width">
         <button class="chart-download-btn" data-chart="wastageTopItemsChart" title="Download PNG"><i class="fas fa-camera"></i></button>
-        <h3><i class="fas fa-ranking-star"></i> Top 15 Wasted Items</h3>
+        <h3><i class="fas fa-ranking-star"></i> <span id="wItemsTitle">Top 15 Wasted Items</span></h3>
+        <div class="segmented" id="wItemsMode" style="margin:-4px 0 10px;"><button type="button" class="seg-btn active" data-wmode="top">Top 15</button><button type="button" class="seg-btn" data-wmode="bottom">Bottom 15</button></div>
         <div class="chart-container" style="height:380px"><canvas id="wastageTopItemsChart"></canvas></div>
       </div>
     </div>
@@ -1256,7 +1293,7 @@
       <div class="heat-controls">
         <div class="heat-seg">
           <button type="button" class="toggle-btn active" data-hm="sales">Sales</button>
-          <button type="button" class="toggle-btn" data-hm="cc">CC</button>
+          <button type="button" class="toggle-btn" data-hm="cc">ADT</button>
           <button type="button" class="toggle-btn" data-hm="at">AT</button>
         </div>
         <button type="button" class="toggle-btn" id="heatAdsBtn"><i class="fas fa-calculator"></i> ADS</button>
@@ -1532,9 +1569,9 @@
             </tr>
             <tr>
               <th class="left-cell">Day</th>
-              <th class="group-2025">Sales</th><th class="group-2025">CC</th><th class="group-2025">AT</th>
-              <th class="group-prev">Sales</th><th class="group-prev">CC</th><th class="group-prev">AT</th>
-              <th class="group-2026">Sales</th><th class="group-2026">CC</th><th class="group-2026">AT</th>
+              <th class="group-2025">Sales</th><th class="group-2025">ADT</th><th class="group-2025">AT</th>
+              <th class="group-prev">Sales</th><th class="group-prev">ADT</th><th class="group-prev">AT</th>
+              <th class="group-2026">Sales</th><th class="group-2026">ADT</th><th class="group-2026">AT</th>
               <th class="group-waste">Waste</th><th class="group-waste">Waste %</th><th class="group-waste">Waste Qty</th>
               <th class="group-ratios">LFL</th><th class="group-ratios">Tgt</th><th class="group-ratios">MoM</th>
             </tr>
@@ -2203,11 +2240,16 @@ function defaultTabFilters(tab) {
   const allOf = k => (FilterState[k] ? FilterState[k].options.map(o => o.value) : []);
   const s = { year: allOf('year'), month: allOf('month'), store: allOf('store'), area: allOf('area'), dow: allOf('dow'), segment: allOf('segment'), format: allOf('format'), category: allOf('category') };
   if (tab !== 'yoy' && rows.length) {
-    const latestY = Math.max(...rows.map(r => r.year).filter(y => y != null));
-    const latestM = Math.max(...rows.filter(r => r.year === latestY).map(r => r.month).filter(m => m != null));
+    const latestY = maxOf(rows.map(r => r.year).filter(y => y != null));
+    const latestM = maxOf(rows.filter(r => r.year === latestY).map(r => r.month).filter(m => m != null));
     s.month = [String(latestM)];
     const food = s.category.find(c => /food/i.test(c));
     if (food) s.category = [food];
+  }
+  // Sales pages open on the current year and the year before it (YoY keeps every year)
+  if (tab !== 'yoy' && rows.length) {
+    const latestYr = maxOf(rows.map(r => r.year).filter(y => y != null));
+    s.year = [String(latestYr), String(latestYr - 1)].filter(v => FilterState.year.options.some(o => o.value === v));
   }
   // Days run from 1 to the last day that has data (e.g. 1 to 11 when the file ends on the 11th)
   s.dayFrom = '1';
@@ -2217,9 +2259,9 @@ function defaultTabFilters(tab) {
 }
 function latestDayOf(rows) {
   if (!rows.length) return 31;
-  const lY = Math.max(...rows.map(r => r.year).filter(y => y != null));
-  const lM = Math.max(...rows.filter(r => r.year === lY).map(r => r.month).filter(m => m != null));
-  const d = Math.max(0, ...rows.filter(r => r.year === lY && r.month === lM).map(r => r.day).filter(x => x != null));
+  const lY = maxOf(rows.map(r => r.year).filter(y => y != null));
+  const lM = maxOf(rows.filter(r => r.year === lY).map(r => r.month).filter(m => m != null));
+  const d = Math.max(0, maxOf(rows.filter(r => r.year === lY && r.month === lM).map(r => r.day).filter(x => x != null)));
   return d || 31;
 }
 function applyTabFilters(s) {
@@ -2244,25 +2286,53 @@ function applyTabFilters(s) {
   if (s.dayTo) document.getElementById('dayTo').value = s.dayTo;
   if (window.applyFiltersAndRender) window.applyFiltersAndRender();
 }
-function applyTabState(tab) {
-  if (!(window.__rawData || []).length) return;
-  applyTabFilters(tabFilterStore[tab] || defaultTabFilters(tab));
-}
-// Called when the data has fully loaded (and when wastage arrives): sets defaults for the page being shown
+// Filters are shared by every page except YoY Compare, which keeps its own set.
+// Entering YoY saves the shared filters; leaving YoY puts them back.
+let sharedFilterSnapshot = null, yoyFilterState = null, yearBeforeWastage = null;
+// Called once when the data has fully loaded: sets the default filters
 window.__applyTabDefaultsNow = function () {
-  if (!tabFilterStore[activeFilterTab]) applyTabState(activeFilterTab);
+  if (window.__defaultsApplied) return;
+  window.__defaultsApplied = true;
+  if (activeFilterTab === 'yoy') {
+    sharedFilterSnapshot = defaultTabFilters('overview');
+    applyTabFilters(yoyFilterState || defaultTabFilters('yoy'));
+  } else {
+    applyTabFilters(defaultTabFilters(activeFilterTab));
+  }
 };
 
 function switchTab(tabName) {
   const meta = TAB_META[tabName];
   if (!meta) return;
 
-  // Save this page's filters before leaving it, then set up the page being opened
-  if (activeFilterTab !== tabName && (window.__rawData || []).length) tabFilterStore[activeFilterTab] = captureTabFilters();
+  const hasData = (window.__rawData || []).length > 0;
+  // Wastage has its own year: it opens on the latest year, and the sales years come back when you leave
+  let yearChanged = false;
+  // Wastage and Heatmap show only the latest year; the sales years come back when you leave both
+  const yearPage = t => t === 'wastage' || t === 'heatmap';
+  if (hasData && yearPage(tabName) && !yearPage(activeFilterTab)) {
+    yearBeforeWastage = [...FilterState.year.selected];
+    const latestRows = tabName === 'wastage' ? (window.__wastageData || []) : (window.__rawData || []);
+    const ly = latestRows.length ? maxOf(latestRows.map(r => r.year).filter(y => y != null)) : NaN;
+    if (isFinite(ly)) { FilterState.year.selected = new Set([String(ly)]); renderOptions('year'); updateChipLabel('year'); yearChanged = true; }
+  } else if (hasData && yearPage(activeFilterTab) && !yearPage(tabName) && yearBeforeWastage) {
+    FilterState.year.selected = new Set(yearBeforeWastage);
+    renderOptions('year'); updateChipLabel('year');
+    yearBeforeWastage = null;
+    yearChanged = true;
+  }
+  if (hasData && activeFilterTab !== 'yoy' && tabName === 'yoy') {
+    sharedFilterSnapshot = captureTabFilters();
+    applyTabFilters(yoyFilterState || defaultTabFilters('yoy'));
+  } else if (hasData && activeFilterTab === 'yoy' && tabName !== 'yoy') {
+    yoyFilterState = captureTabFilters();
+    applyTabFilters(sharedFilterSnapshot || defaultTabFilters('overview'));
+  }
   activeFilterTab = tabName;
 
   window.__activeTab = tabName;
-  if ((window.__rawData || []).length) applyTabState(tabName);
+  if (yearChanged && window.applyFiltersAndRender) window.applyFiltersAndRender();
+  if (tabName === 'wastage' && window.__applyWastageDefaults) window.__applyWastageDefaults();
   document.querySelectorAll('.tab-btn').forEach(b => {
     const on = b.dataset.tab === tabName;
     b.classList.toggle('active', on);
@@ -2543,6 +2613,9 @@ const FILTER_KEYS = ['year','month','store','area','dow','category','segment','f
 const FilterState = {}; const masterAllOptions = {};
 FILTER_KEYS.forEach(k => { FilterState[k] = { options: [], selected: new Set() }; masterAllOptions[k] = []; });
 
+// Largest value in a list. Used instead of Math.max(...list), which fails on very large lists.
+function maxOf(list) { let m = -Infinity; for (const v of list) if (v > m) m = v; return m; }
+
 // ===== LINKED FILTERS =====
 // Format options follow the Segment filter; Store options follow Manager, Segment and Format.
 // A filter counts as "narrowed" when some, but not all, of its listed options are selected.
@@ -2567,18 +2640,24 @@ function computeAvailableStoreOptions() {
   return unique;
 }
 // Replaces a filter's option list, keeping still-valid selections (or selecting everything when none remain)
-function setFilterOptions(key, options) {
+// resetAll: select every new option (used when the parent filter goes back to All)
+// wasAll: if everything was selected before, everything stays selected after the list changes
+function setFilterOptions(key, options, resetAll = false) {
+  const wasAll = FilterState[key].selected.size === FilterState[key].options.length;
   FilterState[key].options = options;
   const valid = new Set(options.map(o => o.value));
   const kept = new Set();
   FilterState[key].selected.forEach(v => { if (valid.has(v)) kept.add(v); });
-  if (kept.size === 0) options.forEach(o => kept.add(o.value));
+  // An empty selection means "All", so clearing a filter is not undone here
+  if (resetAll || wasAll) { kept.clear(); options.forEach(o => kept.add(o.value)); }
   FilterState[key].selected = kept;
   renderOptions(key);
   updateChipLabel(key);
 }
-function rebuildStoreOptionsFromManagers() {
-  setFilterOptions('format', computeAvailableFormatOptions());   // formats first: stores depend on them
+// changedKey: the filter the user just changed (segment, format, area or store)
+function rebuildStoreOptionsFromManagers(changedKey) {
+  // Formats follow the segment selection; when Segment goes back to All, every format shows again
+  setFilterOptions('format', computeAvailableFormatOptions(), changedKey === 'segment' && !narrowedSelection('segment'));
   setFilterOptions('store', computeAvailableStoreOptions());
 }
 // When exactly one month is selected, the day range follows that month's data
@@ -2614,7 +2693,7 @@ document.querySelectorAll('[data-dropdown] [data-options]').forEach(container =>
     else FilterState[key].selected.add(v);
     el.classList.toggle('selected', FilterState[key].selected.has(v));
     updateChipLabel(key);
-    if (key === 'area' || key === 'segment' || key === 'format') rebuildStoreOptionsFromManagers();
+    if (key === 'area' || key === 'segment' || key === 'format') rebuildStoreOptionsFromManagers(key);
     if (key === 'month') syncDayRangeToMonth(false);
     if (window.applyFiltersAndRender) window.applyFiltersAndRender();
   });
@@ -2670,7 +2749,7 @@ document.querySelectorAll('[data-all]').forEach(btn => btn.addEventListener('cli
   const key = btn.closest('[data-dropdown]').dataset.dropdown;
   FilterState[key].selected = new Set(FilterState[key].options.map(o => o.value));
   renderOptions(key); updateChipLabel(key);
-  if (key === 'area' || key === 'segment' || key === 'format') rebuildStoreOptionsFromManagers();
+  if (key === 'area' || key === 'segment' || key === 'format') rebuildStoreOptionsFromManagers(key);
   if (key === 'month') syncDayRangeToMonth(false);
   if (window.applyFiltersAndRender) window.applyFiltersAndRender();
 }));
@@ -2679,7 +2758,7 @@ document.querySelectorAll('[data-none]').forEach(btn => btn.addEventListener('cl
   const key = btn.closest('[data-dropdown]').dataset.dropdown;
   FilterState[key].selected.clear();
   renderOptions(key); updateChipLabel(key);
-  if (key === 'area' || key === 'segment' || key === 'format') rebuildStoreOptionsFromManagers();
+  if (key === 'area' || key === 'segment' || key === 'format') rebuildStoreOptionsFromManagers(key);
   if (key === 'month') syncDayRangeToMonth(true);
   if (window.applyFiltersAndRender) window.applyFiltersAndRender();
 }));
@@ -3238,10 +3317,20 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     // Headline values (the growth figures above become the small pills beside them)
     const tgtPct = tFY > 0 ? sYNet / tFY * 100 : null;
     $('kpiTargetMain').textContent = tgtPct != null ? tgtPct.toFixed(1) + '%' : '—';
+    // Zone gauge: the scale runs 0 to 120% (red below 80, amber 80-100, green 100-120). The needle points to the achievement.
+    {
+      const pctG = tgtPct != null && isFinite(tgtPct) ? Math.max(0, Math.min(120, tgtPct)) : 0;
+      const theta = Math.PI * (1 - pctG / 120);
+      const needle = $('kpiNeedle');
+      if (needle) {
+        needle.setAttribute('x2', (70 + 44 * Math.cos(theta)).toFixed(1));
+        needle.setAttribute('y2', (84 - 44 * Math.sin(theta)).toFixed(1));
+      }
+    }
     // Ring gauge: full circle = 100% of target (circumference of r=27 is 169.65)
     $('kpiTargetRing').style.strokeDashoffset = String(169.65 * (1 - (tgtPct != null ? Math.max(0, Math.min(100, tgtPct)) : 0) / 100));
     $('kpiSalesLabel').textContent = adsMode ? `Avg Daily Sales ${CY}` : `Sales ${CY}`;
-    $('kpiCcLabel').textContent = adsMode ? `Avg Daily CC ${CY}` : `Customers ${CY}`;
+    $('kpiCcLabel').textContent = adsMode ? `Avg Daily ADT ${CY}` : `ADT ${CY}`;
     $('kpiSalesMain').textContent = d26.length ? fmtCur(n26) : '—';
     $('kpiCcMain').textContent = d26.length ? fmtNum(c26) : '—';
     $('kpiAtMain').textContent = rC26 > 0 ? fmtAT(at26) : '—';
@@ -3505,6 +3594,145 @@ function getMaxDayForMonth(targetYear, targetMonth) {
   let warehouseAllocMap = new Map();
   let wastageSort = { key: null, dir: 'desc' };
   let wastageCharts = { category: null, monthly: null, items: null };
+  // ===== WASTAGE 3-MONTH COMPARISON (full screen popup) =====
+  // Rows = categories, columns = three picked months. Period filters are ignored here so any three months can be picked.
+  function wastageCmpRows() {
+    const saveY = FilterState.year.selected, saveM = FilterState.month.selected;
+    FilterState.year.selected = new Set(FilterState.year.options.map(o => o.value));
+    FilterState.month.selected = new Set(FilterState.month.options.map(o => o.value));
+    const rows = getFilteredWastage();
+    FilterState.year.selected = saveY; FilterState.month.selected = saveM;
+    return rows;
+  }
+  const wCmpKey = r => `${r.year}-${String(r.month).padStart(2, '0')}`;
+  const wCmpLabel = k => { const [y, m] = k.split('-'); return `${MONTHS[Number(m) - 1]} ${y}`; };
+  let wCmpPicked = [];
+  // 'trend' = Sales, Wastage, Waste % (opened from Wastage Trend); 'category' = Amount and Qty (opened from Wastage by Category)
+  let wCmpMode = 'trend';
+  function renderWastageCmp() {
+    const rows = wastageCmpRows().filter(r => r.year && r.month);
+    const keys = [...new Set(rows.map(wCmpKey))].sort();
+    if (!keys.length) { $('wCmpBody').innerHTML = '<tr><td class="modal-empty" colspan="10">No wastage data loaded.</td></tr>'; return; }
+    if (wCmpPicked.length !== 3 || !wCmpPicked.every(k => keys.includes(k))) { const last = keys.slice(-3); while (last.length < 3) last.unshift(last[0]); wCmpPicked = last; }
+    [0, 1, 2].forEach(i => {
+      const sel = $('wCmpSel' + i);
+      sel.innerHTML = keys.map(k => `<option value="${k}">${wCmpLabel(k)}</option>`).join('');
+      sel.value = wCmpPicked[i];
+    });
+    // Groups the picked months' rows by any key (category or area manager), biggest latest-month amount first
+    const buildGroups = (keyOf, nameOf) => {
+      const groups = new Map();
+      rows.forEach(r => {
+        const k = wCmpKey(r);
+        if (!wCmpPicked.includes(k)) return;
+        const id = keyOf(r);
+        if (!groups.has(id)) groups.set(id, { name: nameOf(r), amt: [0, 0, 0], qty: [0, 0, 0] });
+        const g = groups.get(id);
+        wCmpPicked.forEach((p, i) => { if (p === k) { g.amt[i] += r.wastageCost; g.qty[i] += r.qty; } });
+      });
+      return [...groups.values()].sort((a, b) => b.amt[2] - a.amt[2]);
+    };
+    // Sales for the same months and the same filters, so wastage can be shown as a % of sales.
+    // Sales are only known per area manager, so category rows show "—" for sales.
+    const salesRows = (window.__rawData || []).filter(r => r.year && r.month && (window.__passNonPeriod ? window.__passNonPeriod(r) : true));
+    const salesOf = (p, area) => salesRows.reduce((s, r) => (wCmpKey(r) === p && (area == null || r.area === area) ? s + r.net : s), 0);
+    const totalSales = wCmpPicked.map(p => salesOf(p, null));
+    const catList = buildGroups(r => r.category || 'UNMAPPED', r => (r.category || 'UNMAPPED') === 'UNMAPPED' ? 'Raw Wastage' : r.category);
+    const amList = buildGroups(r => r.am || 'Unmapped', r => r.am || 'Unmapped');
+    amList.forEach(g => { g.sales = wCmpPicked.map(p => salesOf(p, g.name)); });
+    // Items mode: the same 15 items as the chart (top 15, or bottom 15 among items that were wasted), ranked by the latest month
+    const itemAll = buildGroups(r => `${r.itemNo}||${r.itemName || ''}`, r => r.itemName || r.itemNo);
+    const itemList = wastageItemsMode === 'bottom'
+      ? itemAll.filter(g => g.amt[2] > 0).sort((a, b) => a.amt[2] - b.amt[2]).slice(0, 15)
+      : itemAll.slice(0, 15);
+    const pctCell = (now, base) => {
+      if (!(base > 0) || !(now > 0)) return '<td class="cell-ratios">—</td>';
+      const d = (now / base - 1) * 100;
+      return `<td class="cell-ratios ${d <= 0 ? 'pct-up' : 'pct-down'}"><span class="chip">${d >= 0 ? '+' : ''}${d.toFixed(1)}%</span></td>`;
+    };
+    const cls = ['2025', 'prev', '2026'];
+    // Trend popup: Sales | Wastage | Waste % per month. Category popup: Amount | Qty per month.
+    const isCat = wCmpMode !== 'trend';
+    const perMonth = isCat ? 2 : 3;
+    const width = 1 + perMonth * 3 + 3;
+    const pctOf = (w, s) => (s > 0 ? (w / s * 100).toFixed(2) + '%' : '—');
+    const monthHead = isCat
+      ? wCmpPicked.map((p, i) => `<th class="group-${cls[i]}">Amount</th><th class="group-${cls[i]}">Qty</th>`).join('')
+      : wCmpPicked.map((p, i) => `<th class="group-${cls[i]}">Sales</th><th class="group-${cls[i]}">Wastage</th><th class="group-${cls[i]}">Waste %</th>`).join('');
+    $('wCmpHead').innerHTML = `
+      <tr><th class="left-cell">&nbsp;</th>${wCmpPicked.map((p, i) => `<th colspan="${perMonth}" class="group-${cls[i]}">${wCmpLabel(p)}</th>`).join('')}<th colspan="3" class="group-ratios">${isCat ? 'Amount change' : 'Wastage change'}</th></tr>
+      <tr><th class="left-cell">Group</th>${monthHead}<th class="group-ratios">${wCmpLabel(wCmpPicked[1])} vs ${wCmpLabel(wCmpPicked[0])}</th><th class="group-ratios">${wCmpLabel(wCmpPicked[2])} vs ${wCmpLabel(wCmpPicked[1])}</th><th class="group-ratios">${wCmpLabel(wCmpPicked[2])} vs ${wCmpLabel(wCmpPicked[0])}</th></tr>`;
+    const cells = g => g.amt.map((a, i) => {
+      if (isCat) return `<td class="cell-${cls[i]}">${fmtCur(a)}</td><td class="cell-${cls[i]}">${fmtNum(g.qty[i])}</td>`;
+      const s = g.sales ? g.sales[i] : null;
+      return `<td class="cell-${cls[i]}">${s == null ? '—' : fmtCur(s)}</td><td class="cell-${cls[i]}">${fmtCur(a)}</td><td class="cell-${cls[i]}">${s == null ? '—' : pctOf(a, s)}</td>`;
+    }).join('') + pctCell(g.amt[1], g.amt[0]) + pctCell(g.amt[2], g.amt[1]) + pctCell(g.amt[2], g.amt[0]);
+    // Two sections in one table: by category first, then by area manager below it
+    const body = [];
+    const section = (title, list) => {
+      body.push(`<tr class="cmp-section"><td colspan="${width}" class="left-cell"><strong>${title}</strong></td></tr>`);
+      const total = { amt: [0, 0, 0], qty: [0, 0, 0], sales: totalSales };
+      list.forEach(g => {
+        g.amt.forEach((a, i) => { total.amt[i] += a; total.qty[i] += g.qty[i]; });
+        body.push(`<tr><td class="left-cell"><strong>${escapeHtml(g.name)}</strong></td>${cells(g)}</tr>`);
+      });
+      if (list.length) body.push(`<tr class="subtotal-row"><td class="left-cell">Total (${list.length})</td>${cells(total)}</tr>`);
+      else body.push(`<tr><td class="modal-empty" colspan="${width}">No wastage in the selected months for the current filters.</td></tr>`);
+    };
+    if (wCmpMode === 'items') section(wastageItemsMode === 'bottom' ? 'Bottom 15 items' : 'Top 15 items', itemList);
+    else { section('By category', catList); section('By area manager', amList); }
+    $('wCmpBody').innerHTML = body.join('');
+  }
+  [0, 1, 2].forEach(i => $('wCmpSel' + i).addEventListener('change', e => { wCmpPicked[i] = e.target.value; renderWastageCmp(); }));
+  $('wCmpClose').addEventListener('click', () => { $('wCmpOverlay').style.display = 'none'; });
+  $('wCmpExcel').addEventListener('click', function () {
+    if (!librariesReady() || !window.__tableToAoa) return;
+    guardBusy(this, 'Exporting…', async () => {
+      const wb = XLSX.utils.book_new();
+      const title = { category: 'Wastage by Category', items: 'Wastage Top-Bottom 15 Items', trend: 'Wastage Trend' }[wCmpMode];
+      XLSX.utils.book_append_sheet(wb, makeSheet(window.__tableToAoa(document.querySelector('#wCmpOverlay table'), true)), `${title} 3-Month`.slice(0, 31));
+      await downloadWorkbook(wb, `Wastage_3Month_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      showToast('Comparison exported', 'success');
+    });
+  });
+  $('wCmpPdf').addEventListener('click', function () {
+    if (!tablePdfReady()) return;
+    guardBusy(this, 'Generating PDF...', () => {
+      const title = ({ category: 'Wastage by Category', items: 'Wastage Top-Bottom 15 Items', trend: 'Wastage Trend' })[wCmpMode] + ' - 3-Month Comparison';
+      downloadTablePdf({
+        tableEl: document.querySelector('#wCmpOverlay table'),
+        title,
+        subtitle: `${wCmpPicked.map(wCmpLabel).join(' / ')} - ${new Date().toLocaleString()}`,
+        filename: `Wastage_3Month_${new Date().toISOString().slice(0, 10)}.pdf`
+      });
+      showToast('PDF downloaded', 'success');
+    });
+  });
+  $('wCmpOverlay').addEventListener('click', e => { if (e.target === $('wCmpOverlay')) $('wCmpOverlay').style.display = 'none'; });
+  document.querySelectorAll('[data-chart="wastageCategoryChart"], [data-chart="wastageMonthlyChart"], [data-chart="wastageAmChart"], [data-chart="wastageTopItemsChart"]').forEach(dl => {
+    const h3 = dl.closest('.chart-card') && dl.closest('.chart-card').querySelector('h3');
+    if (!h3) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'toggle-btn';
+    btn.style.cssText = 'margin-left:10px;vertical-align:middle;';
+    btn.innerHTML = '<i class="fas fa-code-compare"></i> 3-Month';
+    btn.title = 'Compare any three months in full screen';
+    btn.addEventListener('click', () => {
+      wCmpMode = dl.dataset.chart === 'wastageCategoryChart' ? 'category' : dl.dataset.chart === 'wastageTopItemsChart' ? 'items' : 'trend';
+      renderWastageCmp();
+      $('wCmpOverlay').style.display = 'flex';
+    });
+    h3.appendChild(btn);
+  });
+
+  // Top 15 / Bottom 15 switch for the wasted items chart
+  let wastageItemsMode = 'top', lastWastageRender = null;
+  document.querySelectorAll('[data-wmode]').forEach(b => b.addEventListener('click', () => {
+    wastageItemsMode = b.dataset.wmode;
+    document.querySelectorAll('[data-wmode]').forEach(x => x.classList.toggle('active', x === b));
+    if (lastWastageRender) renderWastageCharts(lastWastageRender[0], lastWastageRender[1]);
+  }));
   window.__wastageData = wastageData;
 
   document.querySelectorAll('th[data-wsort]').forEach(th => {
@@ -3628,9 +3856,11 @@ function getMaxDayForMonth(targetYear, targetMonth) {
       $('wastageEmpty').style.display = 'none';
 
       const cats = [...new Set(rows.map(r => r.category))].sort();
-      FilterState.category.options = cats.map(c => ({ value: c, label: c }));
-      FilterState.category.selected = new Set(cats);
-      masterAllOptions.category = cats.map(c => ({ value: c, label: c }));
+      FilterState.category.options = cats.map(c => ({ value: c, label: c === 'UNMAPPED' ? 'Raw Wastage' : c }));
+      // Food is the default category; if there is no Food category, everything is selected
+      const foodCats = cats.filter(c => /^food$/i.test(c));
+      FilterState.category.selected = new Set(foodCats.length ? foodCats : cats);
+      masterAllOptions.category = cats.map(c => ({ value: c, label: c === 'UNMAPPED' ? 'Raw Wastage' : c }));
       renderOptions('category');
       updateChipLabel('category');
 
@@ -3642,6 +3872,8 @@ function getMaxDayForMonth(targetYear, targetMonth) {
       }
 
       applyFiltersAndRender();
+      // Defaults run after this load finishes, so they never nest inside it
+      if (window.__applyWastageDefaults) setTimeout(() => window.__applyWastageDefaults(), 0);
       showToast(`Wastage loaded: ${rows.length} rows`, 'success');
       if (!quiet) {
         if (unmappedWh.size) showToast(`⚠ ${unmappedWh.size} warehouse(s) not in allocation sheet`, 'error');
@@ -3653,6 +3885,31 @@ function getMaxDayForMonth(targetYear, targetMonth) {
       showToast('Wastage failed: ' + err.message, 'error');
     }
   }
+  // First visit to Wastage: Year and Month go to the latest year and month in the wastage file
+  window.__applyWastageDefaults = function () {
+    if (window.__wastageDefaultDone || !wastageData || !wastageData.length) return;
+    window.__wastageDefaultDone = true;
+    const latestY = maxOf(wastageData.map(r => r.year).filter(y => y != null));
+    const latestM = maxOf(wastageData.filter(r => r.year === latestY).map(r => r.month).filter(m => m != null));
+    FilterState.month.selected = new Set([String(latestM)]);
+    // Category defaults to Food
+    const food = FilterState.category.options.map(o => o.value).filter(v => /^food$/i.test(v));
+    if (food.length) FilterState.category.selected = new Set(food);
+    renderOptions('year'); updateChipLabel('year');
+    renderOptions('month'); updateChipLabel('month');
+    renderOptions('category'); updateChipLabel('category');
+    syncDayRangeToMonth(false);
+    applyFiltersAndRender();
+  };
+  // Sets only the Year filter to the latest year in the wastage file (used after the sales defaults)
+  window.__setWastageYearDefault = function (force) {
+    if (!force && window.__activeTab !== 'wastage') return;
+    if (!wastageData || !wastageData.length) return;
+    const latestY = maxOf(wastageData.map(r => r.year).filter(y => y != null));
+    if (!isFinite(latestY)) return;
+    FilterState.year.selected = new Set([String(latestY)]);
+    renderOptions('year'); updateChipLabel('year');
+  };
   window.getFilteredWastage = getFilteredWastage;
   function getFilteredWastage() {
     const selY = [...FilterState.year.selected].map(Number);
@@ -3787,6 +4044,8 @@ function getMaxDayForMonth(targetYear, targetMonth) {
   }
 
   function renderWastageCharts(wFiltered, idx) {
+    lastWastageRender = [wFiltered, idx];
+    renderWastageAmChart(wFiltered);
     // --- Category chart ---
     const byCat = {};
     wFiltered.forEach(r => { byCat[r.category] = (byCat[r.category] || 0) + r.wastageCost; });
@@ -3795,6 +4054,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     const catColors = ['#dc2626','#ea580c','#f59e0b','#eab308','#84cc16','#22c55e','#14b8a6','#06b6d4','#3b82f6','#8b5cf6'];
     wastageCharts.category = new Chart($('wastageCategoryChart').getContext('2d'), {
       type: 'bar',
+      plugins: [wPctLabels((di, i) => { const t = Object.values(byCat).reduce((a, b) => a + b, 0); return t > 0 ? (catEntries[i][1] / t * 100).toFixed(1) + '%' : null; })],
       data: {
         labels: catEntries.map(e => e[0]),
         datasets: [{
@@ -3833,6 +4093,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
 
     if (wastageCharts.monthly) wastageCharts.monthly.destroy();
     wastageCharts.monthly = new Chart($('wastageMonthlyChart').getContext('2d'), {
+      plugins: [wPctLabels((di, i) => (di === 1 ? mPct[i].toFixed(2) + '%' : null))],
       data: {
         labels: mLabels,
         datasets: [
@@ -3860,16 +4121,59 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     const itemMap = new Map();
     wFiltered.forEach(r => {
       const k = `${r.itemNo}||${r.itemName}`;
-      if (!itemMap.has(k)) itemMap.set(k, { name: r.itemName || r.itemNo, cost: 0, qty: 0 });
+      if (!itemMap.has(k)) itemMap.set(k, { itemNo: r.itemNo, name: r.itemName || r.itemNo, cost: 0, qty: 0 });
       const it = itemMap.get(k);
       it.cost += r.wastageCost;
       it.qty += r.qty;
     });
-    const topItems = [...itemMap.values()].sort((a, b) => b.cost - a.cost).slice(0, 15);
+    // Top 15: highest wastage amount. Bottom 15: lowest amount among items that were wasted at all.
+    const ranked = [...itemMap.values()];
+    const topItems = wastageItemsMode === 'bottom'
+      ? ranked.filter(i => i.cost > 0).sort((a, b) => a.cost - b.cost).slice(0, 15)
+      : ranked.sort((a, b) => b.cost - a.cost).slice(0, 15);
+    if ($('wItemsTitle')) $('wItemsTitle').textContent = wastageItemsMode === 'bottom' ? 'Bottom 15 Wasted Items' : 'Top 15 Wasted Items';
 
+    // Click an item: a popup lists each store's quantity and amount for that item
+    function showItemStores(item) {
+      const byStore = new Map();
+      wFiltered.forEach(r => {
+        if (r.itemNo !== item.itemNo || (r.itemName || r.itemNo) !== item.name) return;
+        const k = r.storeCode + '||' + (r.storeName || '');
+        const s = byStore.get(k) || { name: r.storeName || r.storeCode, qty: 0, cost: 0 };
+        s.qty += r.qty; s.cost += r.wastageCost;
+        byStore.set(k, s);
+      });
+      const list = [...byStore.values()].sort((a, b) => b.qty - a.qty);
+      const totQty = list.reduce((a, s) => a + s.qty, 0), totCost = list.reduce((a, s) => a + s.cost, 0);
+      let box = $('itemStoreModal');
+      if (!box) {
+        box = document.createElement('div');
+        box.id = 'itemStoreModal';
+        box.className = 'modal-overlay';
+        document.body.appendChild(box);
+        box.addEventListener('click', e => { if (e.target === box) box.classList.remove('open'); });
+      }
+      const rowsHtml = list.map(s => `<tr><td style="padding:7px 10px;border-bottom:1px solid var(--border);">${escapeHtml(s.name)}</td><td style="padding:7px 10px;border-bottom:1px solid var(--border);text-align:end;">${fmtNum(s.qty)}</td><td style="padding:7px 10px;border-bottom:1px solid var(--border);text-align:end;">${fmtCur(s.cost)}</td></tr>`).join('');
+      box.innerHTML = `<div class="modal-box" role="dialog" aria-label="Wastage by store" style="max-width:640px;width:100%;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);">
+          <strong style="font-size:15px;color:var(--text-main);">${escapeHtml(item.name)}</strong>
+          <button type="button" id="itemStoreClose" aria-label="Close" style="border:none;background:transparent;color:var(--text-muted);font-size:18px;cursor:pointer;">×</button>
+        </div>
+        <div style="padding:8px 16px 16px;max-height:60vh;overflow:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;color:var(--text-main);">
+            <thead><tr><th style="text-align:start;padding:7px 10px;color:var(--text-muted);font-size:12px;">Store</th><th style="text-align:end;padding:7px 10px;color:var(--text-muted);font-size:12px;">Qty</th><th style="text-align:end;padding:7px 10px;color:var(--text-muted);font-size:12px;">Amount</th></tr></thead>
+            <tbody>${rowsHtml || '<tr><td colspan="3" style="padding:10px;">No wastage for this item in the current filters.</td></tr>'}</tbody>
+            <tfoot><tr><td style="padding:8px 10px;font-weight:600;">Total (${list.length} stores)</td><td style="padding:8px 10px;text-align:end;font-weight:600;">${fmtNum(totQty)}</td><td style="padding:8px 10px;text-align:end;font-weight:600;">${fmtCur(totCost)}</td></tr></tfoot>
+          </table>
+        </div>
+      </div>`;
+      $('itemStoreClose').addEventListener('click', () => box.classList.remove('open'));
+      box.classList.add('open');
+    }
     if (wastageCharts.items) wastageCharts.items.destroy();
     wastageCharts.items = new Chart($('wastageTopItemsChart').getContext('2d'), {
       type: 'bar',
+      plugins: [wPctLabels((di, i) => { const t = wFiltered.reduce((a, r) => a + r.wastageCost, 0); return t > 0 && topItems[i] ? (topItems[i].cost / t * 100).toFixed(1) + '%' : null; })],
       data: {
         labels: topItems.map(i => i.name.length > 25 ? i.name.slice(0, 23) + '…' : i.name),
         datasets: [{
@@ -3881,6 +4185,8 @@ function getMaxDayForMonth(targetYear, targetMonth) {
       },
       options: {
         indexAxis: 'y',
+        onClick: (e, els) => { if (els.length) showItemStores(topItems[els[0].index]); },
+        onHover: (e, els, chart) => { chart.canvas.style.cursor = els.length ? 'pointer' : 'default'; },
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -3888,6 +4194,66 @@ function getMaxDayForMonth(targetYear, targetMonth) {
           tooltip: { callbacks: { title: items => topItems[items[0].dataIndex].name, label: c => `${fmtCur(c.raw)} · Qty: ${fmtNum(topItems[c.dataIndex].qty)}` } }
         },
         scales: { x: { beginAtZero: true, ticks: { callback: v => fmtNum(v) } }, y: { grid: { display: false } } }
+      }
+    });
+  }
+
+  // Wastage % of sales per area manager: wastage (this page's filters) divided by sales (the same filters) for that manager
+  // Writes a short label (for example a %) at the end of each bar, or above each line point.
+  // textOf(datasetIndex, pointIndex) returns the text, or null for no label.
+  function wPctLabels(textOf) {
+    return {
+      id: 'wPctLabels',
+      afterDatasetsDraw(chart) {
+        const ctx = chart.ctx, horizontal = chart.options.indexAxis === 'y';
+        ctx.save();
+        ctx.font = "600 11px 'Inter', sans-serif";
+        ctx.fillStyle = getComputedStyle(document.body).color;
+        ctx.textBaseline = horizontal ? 'middle' : 'bottom';
+        ctx.textAlign = horizontal ? 'left' : 'center';
+        chart.data.datasets.forEach((ds, di) => {
+          const meta = chart.getDatasetMeta(di);
+          if (meta.hidden) return;
+          meta.data.forEach((el, i) => {
+            const t = textOf(di, i);
+            if (!t) return;
+            if (horizontal) ctx.fillText(t, el.x + 6, el.y);
+            else ctx.fillText(t, el.x, el.y - 6);
+          });
+        });
+        ctx.restore();
+      }
+    };
+  }
+  let wastageAmChart = null;
+  function renderWastageAmChart(wFiltered) {
+    const canvas = $('wastageAmChart');
+    if (!canvas) return;
+    const salesBy = new Map();
+    (window.__filteredData || []).forEach(r => { if (r.area) salesBy.set(r.area, (salesBy.get(r.area) || 0) + (r.net || 0)); });
+    const wasteBy = new Map();
+    wFiltered.forEach(r => { const a = r.am || 'Unmapped'; wasteBy.set(a, (wasteBy.get(a) || 0) + (r.wastageCost || 0)); });
+    const rows = [...wasteBy.keys()]
+      .filter(a => a !== 'Unmapped' && (salesBy.get(a) || 0) > 0)
+      .map(a => ({ name: a, waste: wasteBy.get(a), sales: salesBy.get(a), pct: wasteBy.get(a) / salesBy.get(a) * 100 }))
+      .sort((a, b) => b.pct - a.pct);
+    if (wastageAmChart) wastageAmChart.destroy();
+    wastageAmChart = new Chart(canvas.getContext('2d'), {
+      type: 'bar',
+      plugins: [wPctLabels((di, i) => (rows[i] ? rows[i].pct.toFixed(2) + '%' : null))],
+      data: {
+        labels: rows.map(r => r.name),
+        datasets: [{ label: 'Wastage % of sales', data: rows.map(r => +r.pct.toFixed(2)), backgroundColor: 'rgba(220,38,38,.8)', borderRadius: 6 }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: c => `${c.raw.toFixed(2)}% · wastage ${fmtCur(rows[c.dataIndex].waste)} of sales ${fmtCur(rows[c.dataIndex].sales)}` } }
+        },
+        scales: { x: { beginAtZero: true, ticks: { callback: v => v + '%' } }, y: { grid: { display: false } } }
       }
     });
   }
@@ -4572,16 +4938,21 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     if (!data || !data.length) return;
     const ctx = getMonthContext();
     const prevY = ctx.curY - 1;
+    // The latest month stops at the last day with data (e.g. 1 to 13 of November); earlier months show in full
+    const lastDay = latestDayOf(window.__rawData || []);
+    const dayCap = m => (m === ctx.curM ? lastDay : 31);
+    // Months after the latest month of the current year (e.g. Dec when data ends in Nov) are not shown
+    const lastTYMonth = maxOf((window.__rawData || []).filter(r => r.year === ctx.curY).map(r => r.month).filter(x => x != null));
 
     const yoyData = [];
     let totalLY_sales = 0, totalLY_cc = 0, totalLY_at = 0, totalLY_days = 0;
     let totalTY_sales = 0, totalTY_cc = 0, totalTY_at = 0, totalTY_days = 0;
 
     for (let m = 1; m <= 12; m++) {
-      const lyRows = data.filter(r => r.year === prevY && r.month === m);
-      const tyRows = data.filter(r => r.year === ctx.curY && r.month === m);
+      const lyRows = data.filter(r => r.year === prevY && r.month === m && (r.day == null || r.day <= dayCap(m)));
+      const tyRows = data.filter(r => r.year === ctx.curY && r.month === m && (r.day == null || r.day <= dayCap(m)));
 
-      if (!lyRows.length && !tyRows.length) continue;
+      if (m > lastTYMonth || (!lyRows.length && !tyRows.length)) continue;
 
       const ly_sales = lyRows.reduce((s, r) => s + r.net, 0);
       const ly_cc = lyRows.reduce((s, r) => s + r.orders, 0);
@@ -4664,8 +5035,8 @@ function getMaxDayForMonth(targetYear, targetMonth) {
         datasets: [
           { label: `${prevY} Sales`, data: yoyData.map(d => d.ly_sales), backgroundColor: 'rgba(148,163,184,.6)', borderRadius: 6, yAxisID: 'y', order: 2 },
           { label: `${ctx.curY} Sales`, data: yoyData.map(d => d.ty_sales), backgroundColor: 'rgba(59,130,246,.9)', borderRadius: 6, yAxisID: 'y', order: 2 },
-          { label: `${prevY} CC`, data: yoyData.map(d => d.ly_cc), backgroundColor: '#f59e0b', yAxisID: 'y1', type: 'line', borderColor: '#f59e0b', borderWidth: 2, tension: .3, pointRadius: 3, order: 1 },
-          { label: `${ctx.curY} CC`, data: yoyData.map(d => d.ty_cc), backgroundColor: '#22c55e', yAxisID: 'y1', type: 'line', borderColor: '#22c55e', borderWidth: 2, tension: .3, pointRadius: 3, order: 1 }
+          { label: `${prevY} ADT`, data: yoyData.map(d => d.ly_cc), backgroundColor: '#f59e0b', yAxisID: 'y1', type: 'line', borderColor: '#f59e0b', borderWidth: 2, tension: .3, pointRadius: 3, order: 1 },
+          { label: `${ctx.curY} ADT`, data: yoyData.map(d => d.ty_cc), backgroundColor: '#22c55e', yAxisID: 'y1', type: 'line', borderColor: '#22c55e', borderWidth: 2, tension: .3, pointRadius: 3, order: 1 }
         ]
       },
       options: {
@@ -4673,7 +5044,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
         interaction: { mode: 'index', intersect: false },
         plugins: {
           legend: LEGEND,
-          tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.datasetIndex > 1 ? fmtNum(c.raw) + ' CC' : fmtCur(c.raw)}` } }
+          tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.datasetIndex > 1 ? fmtNum(c.raw) + ' ADT' : fmtCur(c.raw)}` } }
         },
         scales: {
           x: { grid: { display: false } },
@@ -4819,7 +5190,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
   // The % is each day's share of the total; with ADS on, values are per store-day.
   let heatMetric = 'sales';
   let lastHeatData = null;
-  const HEAT_TITLES = { sales: 'Sales by Day of Week', cc: 'Customers by Day of Week', at: 'Avg Ticket by Day of Week' };
+  const HEAT_TITLES = { sales: 'Sales by Day of Week', cc: 'ADT by Day of Week', at: 'Avg Ticket by Day of Week' };
   function renderHeatmap(data) {
     if (data) lastHeatData = data; else data = lastHeatData;
     const box = $('heatmapContainer');
@@ -4902,7 +5273,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     const wIdx = typeof getFilteredWastage === 'function' ? buildWastageIndex(getFilteredWastage(), data) : [];
     const wMap = new Map();
     wIdx.forEach(w => { if (w.year === CY) wMap.set(`${w.storeCode}||${w.month}`, w); });
-    document.querySelectorAll('#dataTable .th-cc').forEach(th => { th.textContent = adsMode ? 'ADT' : 'CC'; });
+    document.querySelectorAll('#dataTable .th-cc').forEach(th => { th.textContent = 'ADT'; });
 
     const gMap = new Map();
 
@@ -5338,7 +5709,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
       // 2. YoY comparison
       const ctxY = getMonthContext();
       const prevY = ctxY.curY - 1;
-      const yoyRows = [['Month', 'LY Sales', 'LY CC', 'LY AT', 'LY Days', 'TY Sales', 'TY CC', 'TY AT', 'TY Days', 'Sales Growth %', 'CC Growth %', 'AT Growth %']];
+      const yoyRows = [['Month', 'LY Sales', 'LY ADT', 'LY AT', 'LY Days', 'TY Sales', 'TY ADT', 'TY AT', 'TY Days', 'Sales Growth %', 'ADT Growth %', 'AT Growth %']];
       const num = (v, dp) => Number(v.toFixed(dp));
       for (let m = 1; m <= 12; m++) {
         const lyR = filteredData.filter(r => r.year === prevY && r.month === m);
@@ -5605,7 +5976,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
     document.querySelectorAll('#tabFormatAm .fa-header-2026').forEach(el => { el.textContent = `${curYearStr} (${curMonthName})`; });
     document.querySelectorAll('#tabFormatAm .fa-header-prev').forEach(el => { el.textContent = `PREV (${prevMonthName} ${prevYearStr})`; });
 
-    document.querySelectorAll('#tabFormatAm .th-cc').forEach(th => { th.textContent = window.faAds ? 'ADT' : 'CC'; });
+    document.querySelectorAll('#tabFormatAm .th-cc').forEach(th => { th.textContent = 'ADT'; });
 
     buildFormatAmTable(data, 'segment', 'faSegmentBody');
     buildFormatAmTable(data, 'format',  'faFormatBody');
@@ -5677,7 +6048,7 @@ function getMaxDayForMonth(targetYear, targetMonth) {
             groupHead('group-2026', 4), null, null, null,
             groupHead('group-ratios', 3), null, null,
             groupHead('group-waste', 3), null, null]);
-          const ccH = window.faAds ? 'ADT' : 'CC';
+          const ccH = 'ADT';
           const subHead = ['', 'DAYS', 'SALES', ccH, 'AT', 'DAYS', 'SALES', ccH, 'AT', 'DAYS', 'SALES', ccH, 'AT', 'LFL', 'TGT', 'MOM', 'WASTE', 'WASTE %', 'WASTE QTY'];
           aoa.push(subHead);
           styles.push(subHead.map((_, i) => i === 0 ? plainHead : Object.assign({ bold: true, align: 'right' }, G[groupOf(i)])));
@@ -6111,7 +6482,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentChartMetric === 'sales') {
       datasets = applyStyles(currentModalData.sales2025, currentModalData.salesPrev, currentModalData.sales2026, '');
     } else if (currentChartMetric === 'adt') {
-      datasets = applyStyles(currentModalData.adt2025, currentModalData.adtPrev, currentModalData.adt2026, 'CC');
+      datasets = applyStyles(currentModalData.adt2025, currentModalData.adtPrev, currentModalData.adt2026, 'ADT');
     } else if (currentChartMetric === 'at') {
       datasets = applyStyles(currentModalData.at2025, currentModalData.atPrev, currentModalData.at2026, 'AT');
     } else if (currentChartMetric === 'waste') {
@@ -6365,8 +6736,8 @@ function createMonthCompare({ hostId, toggleBtnId, groupings, stacked = false })
         ${picked.map((p, i) => `<th colspan="3" class="group-${cls[i]}">${periodLabel(p)}</th>`).join('')}
         <th colspan="3" class="group-ratios">Sales change</th></tr>
       <tr><th class="left-cell">${headLabel}</th>${hasExtra ? `<th class="left-cell">${groupings[groupIdx].extraLabel}</th>` : ''}
-        ${picked.map((p, i) => `<th class="group-${cls[i]}">Sales</th><th class="group-${cls[i]}">CC</th><th class="group-${cls[i]}">AT</th>`).join('')}
-        <th class="group-ratios">2nd vs 1st</th><th class="group-ratios">3rd vs 2nd</th><th class="group-ratios">3rd vs 1st</th></tr>`;
+        ${picked.map((p, i) => `<th class="group-${cls[i]}">Sales</th><th class="group-${cls[i]}">ADT</th><th class="group-${cls[i]}">AT</th>`).join('')}
+        <th class="group-ratios">${periodLabel(picked[1])} vs ${periodLabel(picked[0])}</th><th class="group-ratios">${periodLabel(picked[2])} vs ${periodLabel(picked[1])}</th><th class="group-ratios">${periodLabel(picked[2])} vs ${periodLabel(picked[0])}</th></tr>`;
     // With ADS on, each month is shown per store-day (sales and customers divided by the store-days with sales)
     const per = g => ({
       net: g.net.map((n, i) => cmpAds ? n / Math.max(1, g.days[i].size) : n),
@@ -6623,7 +6994,7 @@ createMonthCompare({
       const growth = METRICS.growth.valueOf(g), ach = METRICS.target.valueOf(g);
       return `<tr><td class="left-cell"><strong>${escapeHtml(g.name)}</strong></td><td>${fmtCur(g.cy)}</td><td>${fmtCur(g.ly)}</td>${pctCell(growth)}<td>${fmtNum(g.cc)}</td><td>${g.cc > 0 ? fmtAT(g.cy / g.cc) : '—'}</td><td class="${ach == null ? '' : ach >= 1 ? 'pct-up' : 'pct-down'}">${ach == null ? '—' : (ach * 100).toFixed(0) + '%'}</td></tr>`;
     }).join('');
-    return `<div class="ask-table"><table><thead><tr><th class="left-cell">${firstHead}</th><th>Sales ${window.__CY}</th><th>Sales ${window.__LY}</th><th>Growth</th><th>CC</th><th>AT</th><th>Target</th></tr></thead><tbody>${body}</tbody></table></div>`;
+    return `<div class="ask-table"><table><thead><tr><th class="left-cell">${firstHead}</th><th>Sales ${window.__CY}</th><th>Sales ${window.__LY}</th><th>Growth</th><th>ADT</th><th>AT</th><th>Target</th></tr></thead><tbody>${body}</tbody></table></div>`;
   }
 
   function answer(question) {
@@ -7284,6 +7655,8 @@ createMonthCompare({
         var w = await fetchKeyset('wastage_rows', WASTE_SEL);
         applyRows([], w);
         window.__applyTabDefaultsNow();
+        // Wastage can arrive after the sales defaults, so Year is set to the latest year here as well
+        if (window.__setWastageYearDefault) { window.__setWastageYearDefault(); if (window.applyFiltersAndRender) window.applyFiltersAndRender(); }
         showToast('Wastage loaded: ' + w.length + ' rows', 'success');
       } catch (e) {
         console.error('Wastage load failed', e);
