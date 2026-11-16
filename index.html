@@ -121,7 +121,7 @@
       <button class="tab-btn" data-tab="leaderboard" title="Leaderboard"><i class="fas fa-trophy"></i><span class="nav-label">Leaderboard</span></button>
       <button class="tab-btn" data-tab="heatmap" title="Heatmap"><i class="fas fa-fire"></i><span class="nav-label">Heatmap</span></button>
       <button class="tab-btn" data-tab="insights" title="Insights"><i class="fas fa-lightbulb"></i><span class="nav-label">Insights</span></button>
-      <button class="tab-btn wastage-tab" data-tab="wastage" title="Wastage"><i class="fas fa-trash-can"></i><span class="nav-label">Wastage</span><span class="tab-badge" id="wastageBadge" style="display:none;">0</span></button>
+      <button class="tab-btn wastage-tab" data-tab="wastage" title="Wastage"><i class="fas fa-dumpster"></i><span class="nav-label">Wastage</span><span class="tab-badge" id="wastageBadge" style="display:none;">0</span></button>
       <button type="button" class="tab-btn menu-mix-btn" title="Menu Mix"><i class="fas fa-utensils"></i><span class="nav-label">Menu Mix</span></button>
     </nav>
     <div class="sidebar-foot"><span>Sales Intelligence · v7.0</span></div>
@@ -143,6 +143,8 @@
     </div>
 
     <div class="topbar-right">
+      <style>.menu-mix-top.is-open{background:var(--primary-light);color:var(--primary);border-color:var(--primary);}</style>
+      <button type="button" id="menuMixPill" class="tools-btn menu-mix-top" title="Menu Mix (Alt+S)" aria-label="Open Menu Mix"><i class="fas fa-utensils"></i><span>Menu Mix</span></button>
       <div class="dd-wrap">
         <button class="icon-btn" id="notifBtn" title="Notifications">
           <i class="fas fa-bell"></i>
@@ -1022,9 +1024,8 @@
   </div>
   <iframe id="menuMixFrame" title="Menu Mix" style="flex:1;width:100%;border:0;background:#fff;"></iframe>
 </div>
-<button type="button" id="menuMixPill" style="display:none;position:fixed;left:16px;bottom:16px;z-index:1650;align-items:center;gap:8px;padding:10px 14px;border-radius:30px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text-main);box-shadow:var(--shadow-lg);cursor:pointer;font-weight:600;font-size:13px;"><i class="fas fa-utensils"></i> Menu Mix <span style="color:var(--text-muted);font-weight:500;">(Alt+S)</span></button>
 <div style="display:none;">
 </div>
-<script>!function(){var e="https://viewx-yousuf.github.io/Menu-Mix/",t=document.getElementById("menuMixOverlay"),n=document.getElementById("menuMixFrame"),i=document.getElementById("menuMixPill"),l=document.querySelectorAll(".menu-mix-btn");function s(){n.getAttribute("src")||(n.src=e),!1,t.style.display="flex",i.style.display="none"}function d(){"flex"===t.style.display&&(!0,t.style.display="none",i.style.display="inline-flex")}window.self===window.top?(l.forEach((function(e){e.addEventListener("click",(function(){s();var e=document.getElementById("mainSidebar");e&&e.classList.remove("open");var t=document.querySelector(".sidebar-overlay");t&&t.classList.remove("active")}))})),document.getElementById("menuMixMin").addEventListener("click",d),document.getElementById("menuMixClose").addEventListener("click",(function(){!1,t.style.display="none",i.style.display="none",n.removeAttribute("src")})),i.addEventListener("click",s),document.addEventListener("keydown",(function(e){"Escape"===e.key&&"flex"===t.style.display&&d(),!e.altKey||e.ctrlKey||e.metaKey||"s"!==e.key&&"S"!==e.key||(e.preventDefault(),"flex"===t.style.display?d():s())}))):l.forEach((function(e){e.style.display="none"}))}();</script>
+<script>!function(){var e="https://viewx-yousuf.github.io/Menu-Mix/",t=document.getElementById("menuMixOverlay"),n=document.getElementById("menuMixFrame"),i=document.getElementById("menuMixPill"),s=document.querySelectorAll(".menu-mix-btn");function l(){n.getAttribute("src")||(n.src=e),!1,t.style.display="flex",i.classList.add("is-open")}function o(){"flex"===t.style.display&&(!0,t.style.display="none",i.classList.remove("is-open"))}window.self===window.top?(s.forEach((function(e){e.addEventListener("click",(function(){l();var e=document.getElementById("mainSidebar");e&&e.classList.remove("open");var t=document.querySelector(".sidebar-overlay");t&&t.classList.remove("active")}))})),document.getElementById("menuMixMin").addEventListener("click",o),document.getElementById("menuMixClose").addEventListener("click",(function(){!1,t.style.display="none",i.classList.remove("is-open"),n.removeAttribute("src")})),i.addEventListener("click",l),document.addEventListener("keydown",(function(e){"Escape"===e.key&&"flex"===t.style.display&&o(),!e.altKey||e.ctrlKey||e.metaKey||"s"!==e.key&&"S"!==e.key||(e.preventDefault(),"flex"===t.style.display?o():l())}))):s.forEach((function(e){e.style.display="none"}))}();</script>
 </body>
 </html>
